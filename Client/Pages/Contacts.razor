@@ -1,0 +1,36 @@
+﻿@page "/contacts"
+@using BlazorChat.Shared
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h1>Contacts</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (contacts == null)
+{
+  <p><em>Loading...</em></p>
+}
+else
+{
+  <AntList DataSource="@contacts" TItem="Contact">
+    <ListItem>
+      <ListItemMeta Avatar="avatar" Description="@context.Address">
+        <TitleTemplate>
+          <a href="/chat/@context.Firstname">@context.Firstname @context.Lastname</a>
+        </TitleTemplate>
+      </ListItemMeta>
+    </ListItem>
+  </AntList>
+
+}
+
+  @code {
+  private Contact[] contacts;
+
+  protected override async Task OnInitializedAsync()
+  {
+    contacts = await Http.GetFromJsonAsync<Contact[]>("Contacts");
+  }
+
+}
