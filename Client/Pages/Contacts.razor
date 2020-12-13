@@ -1,5 +1,5 @@
 ﻿@page "/contacts"
-@using BlazorChat.Shared
+@using BlazorChat.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 
@@ -13,7 +13,7 @@
 }
 else
 {
-  <AntList DataSource="@contacts" TItem="Contact">
+  <AntList DataSource="@contacts" TItem="ContactReadDto">
     <ListItem>
       <ListItemMeta Avatar="avatar" Description="@context.Address">
         <TitleTemplate>
@@ -26,11 +26,11 @@ else
 }
 
   @code {
-  private Contact[] contacts;
+  private ContactReadDto[] contacts;
 
   protected override async Task OnInitializedAsync()
   {
-    contacts = await Http.GetFromJsonAsync<Contact[]>("Contacts");
+    contacts = await Http.GetFromJsonAsync<ContactReadDto[]>("Contacts");
   }
 
 }

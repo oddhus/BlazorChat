@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using BlazorChat.Shared;
+using BlazorChat.Shared.Models;
+using BlazorChat.Server.Models;
 using MongoDB.Driver;
 
 namespace BlazorChat.Server.Controllers
@@ -24,10 +24,15 @@ namespace BlazorChat.Server.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Contact> Get()
+        public List<ContactReadDto> Get()
         {
-            var con = _contacts.Find(c => true).ToList();
-            return con;
+            IEnumerable<Contact> contacts = _contacts.Find(c => true).ToList();
+            List<ContactReadDto> contactList = new List<ContactReadDto>();
+            foreach (var contact in contacts)
+            {
+                contactList.Add(new ContactReadDto(contact.Id.ToString(), contact.Firstname, contact.Lastname, contact.Address));
+            }
+            return contactList;
         }
     }
 }

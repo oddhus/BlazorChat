@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace BlazorChat.Shared
+namespace BlazorChat.Server.Models
 {
     public class Contact
     {
