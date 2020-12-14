@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,25 +12,25 @@ namespace BlazorChat.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ContactsController : ControllerBase
+    public class UserController : ControllerBase
     {
 
-        private IMongoCollection<Contact> _contacts;
+        private IMongoCollection<User> _users;
         private readonly IMapper _mapper;
 
 
-        public ContactsController(IMongoClient client, IMapper mapper)
+        public UserController(IMongoClient client, IMapper mapper)
         {
             _mapper = mapper;
             var database = client.GetDatabase("BlazorChat");
-            _contacts = database.GetCollection<Contact>("contacts");
+            _users = database.GetCollection<User>("users");
         }
 
-        [HttpGet]
-        public IEnumerable<ContactReadDto> Get()
+        [HttpGet("{userId}")]
+        public UserReadDto Get(string userId)
         {
-            var contacts = _contacts.Find(c => true).ToList();
-            return _mapper.Map<IEnumerable<ContactReadDto>>(contacts);
+            var user = _users.Find<User>(u => u.Id == userId).FirstOrDefault();
+            return _mapper.Map<UserReadDto>(user);
         }
     }
 }

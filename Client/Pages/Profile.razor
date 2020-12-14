@@ -1,7 +1,41 @@
 ﻿@page "/"
+@using BlazorChat.ViewModels
+@using BlazorChat.Shared.Dtos
+@inject HttpClient HttpClient
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
 
+<Space Direction="vertical" Style="width: 100%;">
+  <SpaceItem>
+    <Input @bind-Value="_profileViewModel.Firstname" Placeholder="Firstname" />
+  </SpaceItem>
+  <SpaceItem>
+    <Input @bind-Value="_profileViewModel.Lastname" Placeholder="Lastname" />
+  </SpaceItem>
+  <SpaceItem>
+    <Input @bind-Value="_profileViewModel.Address" Placeholder="Address" />
+  </SpaceItem>
+  <Space>
+    <SpaceItem>
+      <Button Type="primary">Update user</Button>
+    </SpaceItem>
+    <SpaceItem>
+      <Button Type="primary" @onclick="GetProfile">Get user</Button>
+    </SpaceItem>
+  </Space>
+</Space>
+
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+  private ProfileViewModel _profileViewModel = new ProfileViewModel();
+
+  private async Task GetProfile()
+  {
+    var profile = await HttpClient.GetFromJsonAsync<UserReadDto>("user/5fd731080232e18424df19ae");
+    Console.WriteLine(profile);
+    _profileViewModel = profile;
+  }
+}
