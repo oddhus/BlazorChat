@@ -22,7 +22,7 @@ Welcome to your new app.
       <Button Type="primary">Update user</Button>
     </SpaceItem>
     <SpaceItem>
-      <Button Type="primary" @onclick="GetProfile">Get user</Button>
+      <Button Type="primary" @onclick="GetProfile" Loading="loading">Get user</Button>
     </SpaceItem>
   </Space>
 </Space>
@@ -31,11 +31,12 @@ Welcome to your new app.
 
 @code {
   private ProfileViewModel _profileViewModel = new ProfileViewModel();
-
+  private bool loading = false;
   private async Task GetProfile()
   {
+    loading = true;
     var profile = await HttpClient.GetFromJsonAsync<UserReadDto>("user/5fd731080232e18424df19ae");
-    Console.WriteLine(profile);
     _profileViewModel = profile;
+    loading = false;
   }
 }

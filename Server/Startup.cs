@@ -9,6 +9,9 @@ using System.Linq;
 using MongoDB.Driver;
 using AutoMapper;
 using System;
+using BlazorChat.Models;
+using BlazorChat.Server.Services;
+using Microsoft.Extensions.Options;
 
 namespace BlazorChat.Server
 {
@@ -28,6 +31,10 @@ namespace BlazorChat.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.Configure<UserDatabaseSettings>(Configuration.GetSection(nameof(UserDatabaseSettings)));
+            services.AddSingleton<IUserDatabaseSettings>(sp => sp.GetRequiredService<IOptions<UserDatabaseSettings>>().Value);
+            services.AddSingleton<UserService>();
+
             services.AddSingleton<IMongoClient, MongoClient>(s =>
             {
                 var uri = s.GetRequiredService<IConfiguration>()["MongoUri"];

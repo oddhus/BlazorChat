@@ -9,7 +9,9 @@
 
 @if (contacts == null)
 {
-  <p><em>Loading...</em></p>
+  <div class="spinnerContainer">
+    <Spin />
+  </div>
 }
 else
 {
@@ -25,6 +27,16 @@ else
 
 }
 
+  <style>
+    .spinnerContainer {
+      text-align: center;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      padding: 30px 50px;
+      margin: 20px 0;
+    }
+  </style>
+
   @code {
   private ContactReadDto[] contacts;
 
@@ -32,5 +44,4 @@ else
   {
     contacts = await Http.GetFromJsonAsync<ContactReadDto[]>("Contacts");
   }
-
 }
