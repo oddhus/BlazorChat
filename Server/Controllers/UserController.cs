@@ -40,7 +40,7 @@ namespace BlazorChat.Server.Controllers
             {
                 return NotFound();
             }
-            _userService.Update(userId, _mapper.Map<User>(userIn));
+            _userService.Update(userId, user, userIn);
             return NoContent();
         }
     }

@@ -1,5 +1,6 @@
 using BlazorChat.Models;
 using BlazorChat.Server.Models;
+using BlazorChat.Shared.Dtos;
 using MongoDB.Driver;
 using System.Linq;
 
@@ -21,8 +22,12 @@ namespace BlazorChat.Server.Services
             _users.Find<User>(user => user.Id == id).FirstOrDefault();
 
 
-        public void Update(string id, User userIn) =>
-            _users.ReplaceOne(user => user.Id == id, userIn);
-
+        public void Update(string id, User user, UserUpdateDto userIn)
+        {
+            user.Firstname = userIn.Firstname;
+            user.Lastname = userIn.Lastname;
+            user.Address = userIn.Address;
+            _users.ReplaceOne(user => user.Id == id, user);
+        }
     }
 }
