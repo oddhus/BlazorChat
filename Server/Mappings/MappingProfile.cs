@@ -6,7 +6,8 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Contact, ContactReadDto>(); //Map from Developer Object to DeveloperDTO Object
-        CreateMap<User, UserReadDto>(); //Map from Developer Object to DeveloperDTO Object
+        CreateMap<Contact, ContactReadDto>();
+        CreateMap<User, UserReadDto>();
+        CreateMap<UserUpdateDto, User>();
     }
 }

@@ -7,6 +7,7 @@ using BlazorChat.Shared.Dtos;
 using BlazorChat.Server.Models;
 using AutoMapper;
 using BlazorChat.Server.Services;
+using Microsoft.Extensions.Logging;
 
 namespace BlazorChat.Server.Controllers
 {
@@ -32,14 +33,14 @@ namespace BlazorChat.Server.Controllers
         }
 
         [HttpPut("{userId}")]
-        public IActionResult UpdateUser(string userId, User userIn)
+        public IActionResult UpdateUser(string userId, [FromBody] UserUpdateDto userIn)
         {
             var user = _userService.Get(userId);
             if (user == null)
             {
                 return NotFound();
             }
-            _userService.Update(userId, userIn);
+            _userService.Update(userId, _mapper.Map<User>(userIn));
             return NoContent();
         }
     }

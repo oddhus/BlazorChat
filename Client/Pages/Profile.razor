@@ -19,10 +19,10 @@ Welcome to your new app.
   </SpaceItem>
   <Space>
     <SpaceItem>
-      <Button Type="primary">Update user</Button>
+      <Button Type="primary" @onclick="UpdateProfile" Loading="loadingUpdate">Update user</Button>
     </SpaceItem>
     <SpaceItem>
-      <Button Type="primary" @onclick="GetProfile" Loading="loading">Get user</Button>
+      <Button Type="primary" @onclick="GetProfile" Loading="loadingGet">Get user</Button>
     </SpaceItem>
   </Space>
 </Space>
@@ -31,12 +31,23 @@ Welcome to your new app.
 
 @code {
   private ProfileViewModel _profileViewModel = new ProfileViewModel();
-  private bool loading = false;
+  private bool loadingGet = false;
+  private bool loadingUpdate = false;
+
   private async Task GetProfile()
   {
-    loading = true;
+    loadingGet = true;
     var profile = await HttpClient.GetFromJsonAsync<UserReadDto>("user/5fd731080232e18424df19ae");
     _profileViewModel = profile;
-    loading = false;
+    loadingGet = false;
+  }
+
+  private async Task UpdateProfile()
+  {
+    loadingUpdate = true;
+    UserUpdateDto user = _profileViewModel;
+    var profile = await HttpClient.PutAsJsonAsync("user/5fd731080232e18424df19ae", user);
+    Console.WriteLine(profile.ReasonPhrase);
+    loadingUpdate = false;
   }
 }

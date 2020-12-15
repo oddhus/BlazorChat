@@ -16,6 +16,17 @@ namespace BlazorChat.ViewModels
         {
             return new ProfileViewModel
             {
+                Id = user.Id,
+                Firstname = user.Firstname,
+                Lastname = user.Lastname,
+                Address = user.Address,
+            };
+        }
+
+        public static implicit operator UserUpdateDto(ProfileViewModel user)
+        {
+            return new UserUpdateDto
+            {
                 Firstname = user.Firstname,
                 Lastname = user.Lastname,
                 Address = user.Address,
