@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using BlazorChat.ViewModels;
 
 namespace BlazorChat.Client
 {
@@ -18,7 +19,7 @@ namespace BlazorChat.Client
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddAntDesign();
-
+            builder.Services.AddTransient<IProfileViewModel, ProfileViewModel>();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             await builder.Build().RunAsync();

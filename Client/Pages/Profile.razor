@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using BlazorChat.ViewModels
-@using BlazorChat.Shared.Dtos
-@inject HttpClient HttpClient
+@inject IProfileViewModel _profileViewModel
 
 <h1>Hello, world!</h1>
 
@@ -9,20 +8,34 @@ Welcome to your new app.
 
 <Space Direction="vertical" Style="width: 100%;">
   <SpaceItem>
-    <Input @bind-Value="_profileViewModel.Firstname" Placeholder="Firstname" />
+    <Row Gutter="16">
+      <Col Xs="24" Sm="16" Md="12" Lg="8">
+      <Input @bind-Value="_profileViewModel.Firstname" Placeholder="Firstname" />
+      </Col>
+    </Row>
   </SpaceItem>
   <SpaceItem>
-    <Input @bind-Value="_profileViewModel.Lastname" Placeholder="Lastname" />
+    <Row Gutter="16">
+      <Col Xs="24" Sm="16" Md="12" Lg="8">
+      <Input @bind-Value="_profileViewModel.Lastname" Placeholder="Lastname" />
+      </Col>
+    </Row>
   </SpaceItem>
   <SpaceItem>
-    <Input @bind-Value="_profileViewModel.Address" Placeholder="Address" />
+    <Row Gutter="16">
+      <Col Xs="24" Sm="16" Md="12" Lg="8">
+      <Input @bind-Value="_profileViewModel.Address" Placeholder="Address" />
+      </Col>
+    </Row>
   </SpaceItem>
   <Space>
     <SpaceItem>
-      <Button Type="primary" @onclick="UpdateProfile" Loading="loadingUpdate">Update user</Button>
+      <Button Type="primary" @onclick="_profileViewModel.UpdateProfile" Loading="_profileViewModel.LoadingUpdate">Update
+        user</Button>
     </SpaceItem>
     <SpaceItem>
-      <Button Type="primary" @onclick="GetProfile" Loading="loadingGet">Get user</Button>
+      <Button Type="primary" @onclick="_profileViewModel.GetProfile" Loading="_profileViewModel.LoadingGet">Get
+        user</Button>
     </SpaceItem>
   </Space>
 </Space>
@@ -30,24 +43,5 @@ Welcome to your new app.
 <SurveyPrompt Title="How is Blazor working for you?" />
 
 @code {
-  private ProfileViewModel _profileViewModel = new ProfileViewModel();
-  private bool loadingGet = false;
-  private bool loadingUpdate = false;
-
-  private async Task GetProfile()
-  {
-    loadingGet = true;
-    var profile = await HttpClient.GetFromJsonAsync<UserReadDto>("user/5fd731080232e18424df19ae");
-    _profileViewModel = profile;
-    loadingGet = false;
-  }
-
-  private async Task UpdateProfile()
-  {
-    loadingUpdate = true;
-    UserUpdateDto user = _profileViewModel;
-    var profile = await HttpClient.PutAsJsonAsync("user/5fd731080232e18424df19ae", user);
-    Console.WriteLine(profile.ReasonPhrase);
-    loadingUpdate = false;
-  }
+  protected override async Task OnInitializedAsync() => await _profileViewModel.GetProfile();
 }
