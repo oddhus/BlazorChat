@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using BlazorChat.Shared.Dtos;
-using BlazorChat.Server.Models;
 using AutoMapper;
 using BlazorChat.Server.Services;
 using Microsoft.Extensions.Logging;
@@ -41,6 +36,25 @@ namespace BlazorChat.Server.Controllers
                 return NotFound();
             }
             _userService.Update(userId, user, userIn);
+            return NoContent();
+        }
+
+        [HttpGet("settings/{userId}")]
+        public ActionResult<UserSettingsDto> GetUserSettings(string userId)
+        {
+            var settings = _userService.GetUserSettings(userId);
+            return Ok(_mapper.Map<UserSettingsDto>(settings));
+        }
+
+        [HttpPost("settings/{userId}")]
+        public ActionResult UpdateUserSettings(string userId, [FromBody] UserSettingsDto settingIn)
+        {
+            var user = _userService.Get(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            _userService.UpdateUserSettings(userId, settingIn);
             return NoContent();
         }
     }

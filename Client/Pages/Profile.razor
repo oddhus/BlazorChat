@@ -4,7 +4,12 @@
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<p>Welcome to your new app.</p>
+
+@if (_profileViewModel.LoadingGet)
+{
+  <Spin />
+}
 
 <Space Direction="vertical" Style="width: 100%;">
   <SpaceItem>
@@ -40,8 +45,11 @@ Welcome to your new app.
   </Space>
 </Space>
 
+
 <SurveyPrompt Title="How is Blazor working for you?" />
+
 
 @code {
   protected override async Task OnInitializedAsync() => await _profileViewModel.GetProfile();
+
 }

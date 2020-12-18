@@ -1,13 +1,15 @@
 ﻿@page "/contacts"
 @using BlazorChat.Shared.Dtos
+@using BlazorChat.ViewModels
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject IContactsViewModel _contactsViewModel
 
 <h1>Contacts</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (contacts == null)
+@if (_contactsViewModel.Contacts == null)
 {
   <div class="spinnerContainer">
     <Spin />
@@ -15,7 +17,7 @@
 }
 else
 {
-  <AntList DataSource="@contacts" TItem="ContactReadDto">
+  <AntList DataSource="@_contactsViewModel.Contacts" TItem="ContactReadDto">
     <ListItem>
       <ListItemMeta Avatar="avatar" Description="@context.Address">
         <TitleTemplate>
@@ -24,24 +26,19 @@ else
       </ListItemMeta>
     </ListItem>
   </AntList>
-
 }
 
-  <style>
-    .spinnerContainer {
-      text-align: center;
-      border-radius: 4px;
-      margin-bottom: 20px;
-      padding: 30px 50px;
-      margin: 20px 0;
-    }
-  </style>
-
-  @code {
-  private ContactReadDto[] contacts;
-
-  protected override async Task OnInitializedAsync()
-  {
-    contacts = await Http.GetFromJsonAsync<ContactReadDto[]>("Contacts");
+<style>
+  .spinnerContainer {
+    text-align: center;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    padding: 30px 50px;
+    margin: 20px 0;
   }
+</style>
+
+@code {
+  protected override async Task OnInitializedAsync() => await _contactsViewModel.GetContacts();
+
 }

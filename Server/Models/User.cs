@@ -14,5 +14,8 @@ namespace BlazorChat.Server.Models
         public string Lastname { get; set; }
 
         public string Address { get; set; }
+
+        public bool Notifications { get; set; }
+        public bool DarkTheme { get; set; }
     }
 }

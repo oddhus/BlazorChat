@@ -9,5 +9,7 @@ public class MappingProfile : Profile
         CreateMap<Contact, ContactReadDto>();
         CreateMap<User, UserReadDto>();
         CreateMap<UserUpdateDto, User>();
+        CreateMap<UserSettings, UserSettingsDto>();
+        CreateMap<User, UserSettingsDto>();
     }
 }

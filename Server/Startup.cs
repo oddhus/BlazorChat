@@ -63,6 +63,8 @@ namespace BlazorChat.Server
 
             app.UseRouting();
 
+            app.UseWebAssemblyDebugging();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
