@@ -1,10 +1,11 @@
 @page "/"
-@using System.ComponentModel.DataAnnotations;
-@using System.Text.Json;
 @using BlazorChat.ViewModels
 @inject ILoginViewModel _loginViewModel;
+@inject NavigationManager _navigationManager;
 
-<Form Model="@model" LabelCol="new ColLayoutParam { Span = 8 }" WrapperCol="new ColLayoutParam { Span = 16 }">
+<h1>Login</h1>
+
+<Form Model="@_loginViewModel" WrapperCol="new ColLayoutParam { Span = 16 }">
     <FormItem Label="Username">
         <Input @bind-Value="@context.Username" />
     </FormItem>
@@ -15,7 +16,7 @@
         <Checkbox @bind-Value="context.RememberMe">Remember me</Checkbox>
     </FormItem>
     <FormItem WrapperCol="new ColLayoutParam{ Span = 16 }">
-        <Button Type="@ButtonType.Primary" HtmlType="submit">
+        <Button Type="@ButtonType.Primary" OnClick="LoginUser">
             Submit
         </Button>
     </FormItem>
@@ -23,28 +24,9 @@
 
 @code
 {
-    public class Model
+    public async Task LoginUser()
     {
-        [Required]
-        public string Username { get; set; }
-        [Required]
-        public string Password { get; set; }
-        public bool RememberMe { get; set; } = true;
+        await _loginViewModel.Login();
+        _navigationManager.NavigateTo("/profile", true);
     }
-
-    private Model model = new Model();
-
-    private void OnFinish(EditContext editContext)
-    {
-        Console.WriteLine($"Success:{JsonSerializer.Serialize(model)}");
-    }
-
-    private void OnFinishFailed(EditContext editContext)
-    {
-        Console.WriteLine($"Failed:{JsonSerializer.Serialize(model)}");
-    }
-
-    bool loading = false;
-
-    void toggle(bool value) => loading = value;
 }

@@ -18,6 +18,9 @@ namespace BlazorChat.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
+            builder.Services.AddOptions();
+            builder.Services.AddAuthorizationCore();
+
             builder.Services.AddAntDesign();
             builder.Services.AddTransient<IProfileViewModel, ProfileViewModel>();
             builder.Services.AddTransient<ISettingsViewModel, SettingsViewModel>();

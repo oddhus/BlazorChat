@@ -7,7 +7,7 @@ namespace BlazorChat.Server.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public ObjectId Id { get; set; }
+        public string Id { get; set; }
 
         public string Username { get; set; }
 

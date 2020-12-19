@@ -10,7 +10,7 @@ namespace BlazorChat.Server.Services
     {
         private readonly IMongoCollection<User> _users;
 
-        public UserService(IUserDatabaseSettings settings)
+        public UserService(IDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
