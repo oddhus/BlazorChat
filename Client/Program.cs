@@ -22,6 +22,8 @@ namespace BlazorChat.Client
             builder.Services.AddTransient<IProfileViewModel, ProfileViewModel>();
             builder.Services.AddTransient<ISettingsViewModel, SettingsViewModel>();
             builder.Services.AddTransient<IContactsViewModel, ContactsViewModel>();
+            builder.Services.AddTransient<ILoginViewModel, LoginViewModel>();
+
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
