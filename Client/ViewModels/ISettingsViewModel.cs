@@ -8,7 +8,8 @@ namespace BlazorChat.ViewModels
         public bool DarkTheme { get; set; }
         public bool LoadingUpdate { get; set; }
         public bool LoadingGet { get; set; }
-
+        public void DarkThemeChange();
+        public void NotificationsChange();
         public Task Save();
         public Task GetProfile();
     }

@@ -12,17 +12,20 @@
 }
 else
 {
-
-  <input type="checkbox" @bind="@_settingsViewModel.Notifications" id="chkNotification">
-  <label> Notification </label>
-  <br>
-
-  <input type="checkbox" @bind="@_settingsViewModel.DarkTheme" id="chkDarkTheme">
-  <label> Dark Theme </label>
-  <br>
-
-  <Button Type="primary" @onclick="_settingsViewModel.Save" Loading="_settingsViewModel.LoadingUpdate">Update
-    settings</Button>
+  <Space Direction="vertical">
+    <SpaceItem>
+      Dark Theme
+      <Switch Checked=_settingsViewModel.DarkTheme OnChange=_settingsViewModel.DarkThemeChange />
+    </SpaceItem>
+    <SpaceItem>
+      Notification
+      <Switch Checked=_settingsViewModel.Notifications OnChange=_settingsViewModel.NotificationsChange />
+    </SpaceItem>
+    <SpaceItem>
+      <Button Type="primary" @onclick="_settingsViewModel.Save" Loading="_settingsViewModel.LoadingUpdate">Update
+        settings</Button>
+    </SpaceItem>
+  </Space>
 }
 
 @code {

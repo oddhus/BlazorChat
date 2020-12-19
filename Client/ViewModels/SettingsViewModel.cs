@@ -36,6 +36,14 @@ namespace BlazorChat.ViewModels
             var res = await _httpClient.PostAsJsonAsync("user/settings/5fd731080232e18424df19ae", newSettings);
             LoadingUpdate = false;
         }
+        public void DarkThemeChange()
+        {
+            DarkTheme = !DarkTheme;
+        }
+        public void NotificationsChange()
+        {
+            Notifications = !Notifications;
+        }
         private void LoadCurrentObject(SettingsViewModel settingsViewModel)
         {
             DarkTheme = settingsViewModel.DarkTheme;
