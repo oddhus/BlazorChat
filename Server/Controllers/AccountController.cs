@@ -22,10 +22,10 @@ namespace BlazorChat.Server.Controllers
         }
 
         [HttpGet("me/{userId}")]
-        public ActionResult<UserReadDto> GetMe(string userId)
+        public ActionResult<AccountDto> GetMe(string userId)
         {
             var user = _accountService.Get(userId);
-            return Ok(_mapper.Map<UserReadDto>(user));
+            return Ok(_mapper.Map<AccountDto>(user));
         }
 
         [HttpPost("create")]
