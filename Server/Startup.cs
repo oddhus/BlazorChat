@@ -13,6 +13,7 @@ using BlazorChat.Models;
 using BlazorChat.Server.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 
 namespace BlazorChat.Server
 {
@@ -37,12 +38,12 @@ namespace BlazorChat.Server
             services.AddSingleton<IDatabaseSettings>(sp => sp.GetRequiredService<IOptions<UserDatabaseSettings>>().Value);
             services.AddSingleton<UserService>();
 
-
-
             services.AddAuthentication(opt =>
             {
                 opt.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            });
+            }).AddCookie();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<IMongoClient, MongoClient>(s =>
             {
@@ -72,7 +73,6 @@ namespace BlazorChat.Server
 
             app.UseRouting();
 
-            app.UseWebAssemblyDebugging();
             app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>

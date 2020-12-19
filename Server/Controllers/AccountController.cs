@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using BlazorChat.Shared.Dtos;
 using AutoMapper;
 using BlazorChat.Server.Services;
-using Microsoft.Extensions.Logging;
 using BlazorChat.Server.Models;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using System.Threading.Tasks;
 
 namespace BlazorChat.Server.Controllers
 {
@@ -21,11 +23,15 @@ namespace BlazorChat.Server.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("me/{userId}")]
-        public ActionResult<AccountDto> GetMe(string userId)
+        [HttpGet("me")]
+        public ActionResult<AccountDto> GetMe()
         {
-            var user = _accountService.Get(userId);
-            return Ok(_mapper.Map<AccountDto>(user));
+            AccountDto account = new AccountDto();
+            if (User.Identity.IsAuthenticated)
+            {
+                account.Username = User.FindFirstValue(ClaimTypes.Name);
+            }
+            return Ok(account);
         }
 
         [HttpPost("create")]
@@ -36,14 +42,23 @@ namespace BlazorChat.Server.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult LoginAccount([FromBody] LoginDto loginIn)
+        public async Task<ActionResult<AccountDto>> LoginAccount([FromBody] LoginDto loginIn)
         {
             var account = _accountService.Login(loginIn);
             if (account == null)
             {
                 return Forbid();
             }
-            return NoContent();
+
+            var claim = new Claim(ClaimTypes.Name, account.Username);
+            //create claimsIdentity
+            var claimsIdentity = new ClaimsIdentity(new[] { claim }, "serverAuth");
+            //create claimsPrincipal
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+            //Sign In User
+            await HttpContext.SignInAsync(claimsPrincipal);
+
+            return await Task.FromResult(Ok(_mapper.Map<AccountDto>(account)));
         }
     }
 }

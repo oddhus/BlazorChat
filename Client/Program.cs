@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using BlazorChat.ViewModels;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorChat.Client
 {
@@ -27,6 +28,7 @@ namespace BlazorChat.Client
             builder.Services.AddTransient<IContactsViewModel, ContactsViewModel>();
             builder.Services.AddTransient<ILoginViewModel, LoginViewModel>();
 
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

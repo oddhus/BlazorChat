@@ -3,6 +3,9 @@ using BlazorChat.Server.Models;
 using BlazorChat.Shared.Dtos;
 using MongoDB.Driver;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 
 namespace BlazorChat.Server.Services
 {
@@ -21,7 +24,7 @@ namespace BlazorChat.Server.Services
         public Account Login(LoginDto login)
         {
             var account = _accounts.Find<Account>(account => account.Username == login.Username).FirstOrDefault();
-            if (account.Password != login.Password)
+            if (account == null || account.Password != login.Password)
             {
                 return null;
             }
