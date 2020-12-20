@@ -65,5 +65,12 @@ namespace BlazorChat.Server.Controllers
 
             return await Task.FromResult(_mapper.Map<AccountDto>(account));
         }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return NoContent();
+        }
     }
 }
