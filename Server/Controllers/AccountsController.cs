@@ -55,9 +55,10 @@ namespace BlazorChat.Server.Controllers
                 return Forbid();
             }
 
-            var claim = new Claim(ClaimTypes.Name, account.Username);
+            var claimName = new Claim(ClaimTypes.Name, account.Username);
+            var claimNameIdentifier = new Claim(ClaimTypes.NameIdentifier, account.Id);
             //create claimsIdentity
-            var claimsIdentity = new ClaimsIdentity(new[] { claim }, "serverAuth");
+            var claimsIdentity = new ClaimsIdentity(new[] { claimName, claimNameIdentifier }, "serverAuth");
             //create claimsPrincipal
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             //Sign In User
