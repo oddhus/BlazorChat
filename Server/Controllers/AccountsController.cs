@@ -6,21 +6,24 @@ using BlazorChat.Server.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace BlazorChat.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AccountController : ControllerBase
+    public class AccountsController : ControllerBase
     {
-
         private readonly AccountService _accountService;
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
-        public AccountController(AccountService accountService, IMapper mapper)
+        public AccountsController(ILogger<AccountsController> logger, AccountService accountService, IMapper mapper)
         {
             _accountService = accountService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet("me")]
@@ -42,9 +45,11 @@ namespace BlazorChat.Server.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<AccountDto>> LoginAccount([FromBody] LoginDto loginIn)
+        public async Task<ActionResult<AccountDto>> LoginAccount([FromBody] LoginDto credentials)
         {
-            var account = _accountService.Login(loginIn);
+            _logger.LogInformation("User {Name} logged out at {Time}.", credentials.Username, DateTime.UtcNow);
+
+            var account = _accountService.Login(credentials);
             if (account == null)
             {
                 return Forbid();
@@ -58,7 +63,7 @@ namespace BlazorChat.Server.Controllers
             //Sign In User
             await HttpContext.SignInAsync(claimsPrincipal);
 
-            return await Task.FromResult(Ok(_mapper.Map<AccountDto>(account)));
+            return await Task.FromResult(_mapper.Map<AccountDto>(account));
         }
     }
 }

@@ -25,7 +25,7 @@ namespace BlazorChat.ViewModels
         public async Task GetProfile()
         {
             LoadingGet = true;
-            var settings = await _httpClient.GetFromJsonAsync<UserSettingsDto>("user/settings/5fd731080232e18424df19ae");
+            var settings = await _httpClient.GetFromJsonAsync<UserSettingsDto>("users/settings/5fd731080232e18424df19ae");
             LoadCurrentObject(settings);
             LoadingGet = false;
         }
@@ -33,7 +33,7 @@ namespace BlazorChat.ViewModels
         {
             LoadingUpdate = true;
             UserSettingsDto newSettings = this;
-            var res = await _httpClient.PostAsJsonAsync("user/settings/5fd731080232e18424df19ae", newSettings);
+            var res = await _httpClient.PostAsJsonAsync("users/settings/5fd731080232e18424df19ae", newSettings);
             LoadingUpdate = false;
         }
         public void DarkThemeChange()

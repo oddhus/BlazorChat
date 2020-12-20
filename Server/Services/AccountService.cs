@@ -1,11 +1,7 @@
-using BlazorChat.Models;
 using BlazorChat.Server.Models;
 using BlazorChat.Shared.Dtos;
 using MongoDB.Driver;
 using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 
 namespace BlazorChat.Server.Services
 {
@@ -13,17 +9,16 @@ namespace BlazorChat.Server.Services
     {
         private readonly IMongoCollection<Account> _accounts;
 
-        public AccountService(IDatabaseSettings settings)
+        public AccountService(IMongoClient client)
         {
-            var client = new MongoClient(settings.ConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
-            _accounts = database.GetCollection<Account>(settings.AccountsCollectionName);
+            var database = client.GetDatabase("BlazorChat");
+            _accounts = database.GetCollection<Account>("accounts");
         }
 
 
         public Account Login(LoginDto login)
         {
-            var account = _accounts.Find<Account>(account => account.Username == login.Username).FirstOrDefault();
+            var account = _accounts.Find<Account>(account => account.Username.Equals(login.Username)).FirstOrDefault();
             if (account == null || account.Password != login.Password)
             {
                 return null;

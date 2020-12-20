@@ -9,11 +9,9 @@ using System.Linq;
 using MongoDB.Driver;
 using AutoMapper;
 using System;
-using BlazorChat.Models;
 using BlazorChat.Server.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 
 namespace BlazorChat.Server
 {
@@ -34,16 +32,13 @@ namespace BlazorChat.Server
             services.AddRazorPages();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            services.Configure<UserDatabaseSettings>(Configuration.GetSection(nameof(UserDatabaseSettings)));
-            services.AddSingleton<IDatabaseSettings>(sp => sp.GetRequiredService<IOptions<UserDatabaseSettings>>().Value);
             services.AddSingleton<UserService>();
+            services.AddSingleton<AccountService>();
 
             services.AddAuthentication(opt =>
             {
                 opt.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             }).AddCookie();
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<IMongoClient, MongoClient>(s =>
             {
@@ -71,9 +66,9 @@ namespace BlazorChat.Server
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
-            app.UseRouting();
-
             app.UseAuthentication();
+
+            app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {

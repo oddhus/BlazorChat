@@ -26,7 +26,9 @@ namespace BlazorChat.ViewModels
 
         public async Task Login()
         {
-            await _httpClient.PostAsJsonAsync<LoginDto>("users/login", this);
+            LoginDto loginDto = this;
+            var response = await _httpClient.PostAsJsonAsync<LoginDto>("accounts/login", loginDto);
+
         }
 
         public static implicit operator LoginDto(LoginViewModel login)

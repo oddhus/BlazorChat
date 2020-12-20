@@ -1,4 +1,3 @@
-using BlazorChat.Models;
 using BlazorChat.Server.Models;
 using BlazorChat.Shared.Dtos;
 using MongoDB.Driver;
@@ -10,11 +9,10 @@ namespace BlazorChat.Server.Services
     {
         private readonly IMongoCollection<User> _users;
 
-        public UserService(IDatabaseSettings settings)
+        public UserService(IMongoClient client)
         {
-            var client = new MongoClient(settings.ConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
-            _users = database.GetCollection<User>(settings.UsersCollectionName);
+            var database = client.GetDatabase("BlazorChat");
+            _users = database.GetCollection<User>("users");
         }
 
 

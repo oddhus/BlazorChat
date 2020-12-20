@@ -2,19 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using BlazorChat.Shared.Dtos;
 using AutoMapper;
 using BlazorChat.Server.Services;
-using Microsoft.Extensions.Logging;
 
 namespace BlazorChat.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
 
         private readonly UserService _userService;
         private readonly IMapper _mapper;
 
-        public UserController(UserService userService, IMapper mapper)
+        public UsersController(UserService userService, IMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;
