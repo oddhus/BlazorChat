@@ -49,7 +49,7 @@ namespace BlazorChat.ViewModels
         public async Task GetProfile()
         {
             LoadingGet = true;
-            var profile = await _httpClient.GetFromJsonAsync<UserReadDto>("users/5fd731080232e18424df19ae");
+            var profile = await _httpClient.GetFromJsonAsync<UserReadDto>("users/" + this.Id);
             LoadCurrentObject(profile);
             LoadingGet = false;
         }
@@ -57,7 +57,7 @@ namespace BlazorChat.ViewModels
         public async Task UpdateProfile()
         {
             LoadingUpdate = true;
-            await _httpClient.PutAsJsonAsync("users/5fd731080232e18424df19ae", this);
+            await _httpClient.PutAsJsonAsync("users/" + this.Id, this);
             LoadingUpdate = false;
         }
 

@@ -9,6 +9,7 @@ namespace BlazorChat.ViewModels
     public class ContactsViewModel : IContactsViewModel
     {
         //properties
+        public string Id { get; set; }
         public List<ContactReadDto> Contacts { get; set; }
         private HttpClient _httpClient;
 
@@ -22,7 +23,7 @@ namespace BlazorChat.ViewModels
         }
         public async Task GetContacts()
         {
-            var response = await _httpClient.GetFromJsonAsync<ContactReadDto[]>("users/contacts");
+            var response = await _httpClient.GetFromJsonAsync<ContactReadDto[]>("users/" + this.Id + "/contacts");
             LoadCurrentObject(response);
         }
 

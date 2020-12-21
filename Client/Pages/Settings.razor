@@ -1,6 +1,7 @@
 @page "/settings"
 @using BlazorChat.ViewModels
 @inject ISettingsViewModel _settingsViewModel
+@inject NavigationManager NavigationManager
 
 <h1>Settings</h1>
 
@@ -29,5 +30,23 @@ else
 }
 
 @code {
-  protected override async Task OnInitializedAsync() => await _settingsViewModel.GetProfile();
+  [CascadingParameter]
+  private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+  protected override async Task OnInitializedAsync()
+  {
+    var authState = await authenticationStateTask;
+    var user = authState.User;
+
+    if (user.Identity.IsAuthenticated)
+    {
+      var userId = user.FindFirst(c => c.Type == "UserId")?.Value;
+      _settingsViewModel.Id = userId;
+      await _settingsViewModel.GetProfile();
+    }
+    else
+    {
+      NavigationManager.NavigateTo("/");
+    }
+  }
 }

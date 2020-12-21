@@ -8,6 +8,7 @@ namespace BlazorChat.ViewModels
     public class SettingsViewModel : ISettingsViewModel
     {
         //properties
+        public string Id { get; set; }
         public bool Notifications { get; set; }
         public bool DarkTheme { get; set; }
         public bool LoadingUpdate { get; set; }
@@ -25,7 +26,7 @@ namespace BlazorChat.ViewModels
         public async Task GetProfile()
         {
             LoadingGet = true;
-            var settings = await _httpClient.GetFromJsonAsync<UserSettingsDto>("users/settings/5fd731080232e18424df19ae");
+            var settings = await _httpClient.GetFromJsonAsync<UserSettingsDto>("users/" + this.Id + "/settings");
             LoadCurrentObject(settings);
             LoadingGet = false;
         }
@@ -33,7 +34,7 @@ namespace BlazorChat.ViewModels
         {
             LoadingUpdate = true;
             UserSettingsDto newSettings = this;
-            var res = await _httpClient.PostAsJsonAsync("users/settings/5fd731080232e18424df19ae", newSettings);
+            var res = await _httpClient.PostAsJsonAsync("users/" + this.Id + "/settings", newSettings);
             LoadingUpdate = false;
         }
         public void DarkThemeChange()

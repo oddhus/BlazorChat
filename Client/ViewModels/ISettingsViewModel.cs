@@ -4,6 +4,7 @@ namespace BlazorChat.ViewModels
 {
     public interface ISettingsViewModel
     {
+        public string Id { get; set; }
         public bool Notifications { get; set; }
         public bool DarkTheme { get; set; }
         public bool LoadingUpdate { get; set; }

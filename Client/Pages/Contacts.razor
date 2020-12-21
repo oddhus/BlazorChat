@@ -39,6 +39,23 @@ else
 </style>
 
 @code {
-  protected override async Task OnInitializedAsync() => await _contactsViewModel.GetContacts();
+  [CascadingParameter]
+  private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+  protected override async Task OnInitializedAsync()
+  {
+    var authState = await authenticationStateTask;
+    var user = authState.User;
+
+    if (user.Identity.IsAuthenticated)
+    {
+      var userId = user.FindFirst(c => c.Type == "UserId")?.Value;
+      _contactsViewModel.Id = userId;
+      await _contactsViewModel.GetContacts();
+    }
+    else
+    {
+      NavigationManager.NavigateTo("/");
+    }
+  }
 }

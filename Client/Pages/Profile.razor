@@ -1,6 +1,7 @@
 ﻿@page "/profile"
 @using BlazorChat.ViewModels
 @inject IProfileViewModel _profileViewModel
+@inject NavigationManager NavigationManager
 
 <h1>Hello, world!</h1>
 
@@ -48,8 +49,24 @@
 
 <SurveyPrompt Title="How is Blazor working for you?" />
 
-
 @code {
-  protected override async Task OnInitializedAsync() => await _profileViewModel.GetProfile();
+  [CascadingParameter]
+  private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+  protected override async Task OnInitializedAsync()
+  {
+    var authState = await authenticationStateTask;
+    var user = authState.User;
+
+    if (user.Identity.IsAuthenticated)
+    {
+      var userId = user.FindFirst(c => c.Type == "UserId")?.Value;
+      _profileViewModel.Id = userId;
+      await _profileViewModel.GetProfile();
+    }
+    else
+    {
+      NavigationManager.NavigateTo("/");
+    }
+  }
 }

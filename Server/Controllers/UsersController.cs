@@ -3,7 +3,6 @@ using BlazorChat.Shared.Dtos;
 using AutoMapper;
 using BlazorChat.Server.Services;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Linq;
 
 namespace BlazorChat.Server.Controllers
@@ -20,6 +19,18 @@ namespace BlazorChat.Server.Controllers
         {
             _userService = userService;
             _mapper = mapper;
+        }
+
+        [HttpGet("me")]
+        public ActionResult<UserReadDto> Getme()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return new UserReadDto();
+            }
+            string id = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            var user = _userService.Get(id);
+            return Ok(_mapper.Map<UserReadDto>(user));
         }
 
         [HttpGet("{userId}")]
@@ -41,14 +52,14 @@ namespace BlazorChat.Server.Controllers
             return NoContent();
         }
 
-        [HttpGet("settings/{userId}")]
+        [HttpGet("{userId}/settings")]
         public ActionResult<UserSettingsDto> GetUserSettings(string userId)
         {
             var settings = _userService.GetUserSettings(userId);
             return Ok(_mapper.Map<UserSettingsDto>(settings));
         }
 
-        [HttpPost("settings/{userId}")]
+        [HttpPost("{userId}/settings")]
         public ActionResult UpdateUserSettings(string userId, [FromBody] UserSettingsDto settingIn)
         {
             var user = _userService.Get(userId);
@@ -60,11 +71,10 @@ namespace BlazorChat.Server.Controllers
             return NoContent();
         }
 
-        [HttpGet("contacts")]
-        public ActionResult<IEnumerable<ContactReadDto>> GetUserContacts()
+        [HttpGet("{userId}/contacts")]
+        public ActionResult<IEnumerable<ContactReadDto>> GetUserContacts(string userId)
         {
-            string userId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
-            if (userId == null)
+            if (!HttpContext.User.HasClaim("UserId", userId))
             {
                 return Forbid();
             }
