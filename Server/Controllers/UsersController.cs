@@ -3,6 +3,8 @@ using BlazorChat.Shared.Dtos;
 using AutoMapper;
 using BlazorChat.Server.Services;
 using System.Collections.Generic;
+using System.Security.Claims;
+using System.Linq;
 
 namespace BlazorChat.Server.Controllers
 {
@@ -58,10 +60,15 @@ namespace BlazorChat.Server.Controllers
             return NoContent();
         }
 
-        [HttpGet("{accountId}/contacts")]
-        public ActionResult<IEnumerable<ContactReadDto>> GetUserContacts(string accountId)
+        [HttpGet("contacts")]
+        public ActionResult<IEnumerable<ContactReadDto>> GetUserContacts()
         {
-            var user = _userService.GetUserContacts(accountId);
+            string userId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            if (userId == null)
+            {
+                return Forbid();
+            }
+            var user = _userService.GetUserContacts(userId);
             return Ok(_mapper.Map<IEnumerable<ContactReadDto>>(user.Contacts));
         }
     }

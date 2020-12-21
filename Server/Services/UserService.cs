@@ -19,6 +19,9 @@ namespace BlazorChat.Server.Services
         public User Get(string id) =>
             _users.Find<User>(user => user.Id == id).FirstOrDefault();
 
+        public User GetByAccountId(string accountId) =>
+            _users.Find<User>(user => user.AccountId == accountId).FirstOrDefault();
+
         public User GetUserSettings(string id)
         {
             var fieldsBuilder = Builders<User>.Projection;
@@ -44,11 +47,11 @@ namespace BlazorChat.Server.Services
             _users.FindOneAndUpdate<User>(user => user.Id == id, update, option);
         }
 
-        public User GetUserContacts(string id)
+        public User GetUserContacts(string userId)
         {
             var fieldsBuilder = Builders<User>.Projection;
-            var fields = fieldsBuilder.Include(u => u.Contacts).Include(u => u.AccountId);
-            return _users.Find<User>(u => u.AccountId == id).Project<User>(fields).FirstOrDefault();
+            var fields = fieldsBuilder.Include(u => u.Contacts);
+            return _users.Find<User>(u => u.Id == userId).Project<User>(fields).FirstOrDefault();
         }
     }
 }

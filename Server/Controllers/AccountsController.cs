@@ -16,12 +16,14 @@ namespace BlazorChat.Server.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly AccountService _accountService;
+        private readonly UserService _userService;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public AccountsController(ILogger<AccountsController> logger, AccountService accountService, IMapper mapper)
+        public AccountsController(ILogger<AccountsController> logger, AccountService accountService, IMapper mapper, UserService userService)
         {
             _accountService = accountService;
+            _userService = userService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -55,10 +57,12 @@ namespace BlazorChat.Server.Controllers
                 return Forbid();
             }
 
+            var user = _userService.GetByAccountId(account.Id);
             var claimName = new Claim(ClaimTypes.Name, account.Username);
-            var claimNameIdentifier = new Claim(ClaimTypes.NameIdentifier, account.Id);
+            var claimAccount = new Claim("AccountId", account.Id);
+            var clamUser = new Claim("UserId", user.Id);
             //create claimsIdentity
-            var claimsIdentity = new ClaimsIdentity(new[] { claimName, claimNameIdentifier }, "serverAuth");
+            var claimsIdentity = new ClaimsIdentity(new[] { claimName, claimAccount, clamUser }, "serverAuth");
             //create claimsPrincipal
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             //Sign In User

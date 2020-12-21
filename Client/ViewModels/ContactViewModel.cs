@@ -22,7 +22,7 @@ namespace BlazorChat.ViewModels
         }
         public async Task GetContacts()
         {
-            var response = await _httpClient.GetFromJsonAsync<ContactReadDto[]>("users/5fdf08f9a57eeb17a825898c/contacts");
+            var response = await _httpClient.GetFromJsonAsync<ContactReadDto[]>("users/contacts");
             LoadCurrentObject(response);
         }
 
