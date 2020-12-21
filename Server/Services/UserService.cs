@@ -43,5 +43,12 @@ namespace BlazorChat.Server.Services
 
             _users.FindOneAndUpdate<User>(user => user.Id == id, update, option);
         }
+
+        public User GetUserContacts(string id)
+        {
+            var fieldsBuilder = Builders<User>.Projection;
+            var fields = fieldsBuilder.Include(u => u.Contacts).Include(u => u.AccountId);
+            return _users.Find<User>(u => u.AccountId == id).Project<User>(fields).FirstOrDefault();
+        }
     }
 }

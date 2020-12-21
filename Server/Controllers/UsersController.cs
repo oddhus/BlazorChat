@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using BlazorChat.Shared.Dtos;
 using AutoMapper;
 using BlazorChat.Server.Services;
+using System.Collections.Generic;
 
 namespace BlazorChat.Server.Controllers
 {
@@ -55,6 +56,13 @@ namespace BlazorChat.Server.Controllers
             }
             _userService.UpdateUserSettings(userId, settingIn);
             return NoContent();
+        }
+
+        [HttpGet("{accountId}/contacts")]
+        public ActionResult<IEnumerable<ContactReadDto>> GetUserContacts(string accountId)
+        {
+            var user = _userService.GetUserContacts(accountId);
+            return Ok(_mapper.Map<IEnumerable<ContactReadDto>>(user.Contacts));
         }
     }
 }
