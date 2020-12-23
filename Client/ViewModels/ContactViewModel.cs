@@ -9,8 +9,15 @@ namespace BlazorChat.ViewModels
     public class ContactsViewModel : IContactsViewModel
     {
         //properties
-        public string Id { get; set; }
-        public List<ContactReadDto> Contacts { get; set; }
+        public string UserId { get; set; }
+        public string AddFirstname { get; set; }
+        public string AddLastname { get; set; }
+        public string AddAddress { get; set; }
+        public bool LoadingGet { get; set; }
+        public bool LoadingUpdate { get; set; }
+        public bool Failed { get; set; }
+        public string ErrorMessage { get; set; }
+        public List<ContactDto> Contacts { get; set; }
         private HttpClient _httpClient;
 
         //methods
@@ -23,19 +30,61 @@ namespace BlazorChat.ViewModels
         }
         public async Task GetContacts()
         {
-            var response = await _httpClient.GetFromJsonAsync<ContactReadDto[]>("users/" + this.Id + "/contacts");
+            var response = await _httpClient.GetFromJsonAsync<ContactDto[]>("users/" + this.UserId + "/contacts");
             LoadCurrentObject(response);
         }
 
-        private void LoadCurrentObject(ContactReadDto[] contacts)
+        public async Task AddContact()
         {
-            this.Contacts = new List<ContactReadDto>();
-            foreach (ContactReadDto contact in contacts)
+            LoadingUpdate = true;
+            try
+            {
+                ContactDto contactDto = this;
+                var res = await _httpClient.PostAsJsonAsync("users/" + this.UserId + "/contacts", contactDto);
+                Failed = false;
+                LoadingUpdate = false;
+            }
+            catch (System.Exception)
+            {
+                Failed = true;
+                ErrorMessage = "Failed to add contact";
+                LoadingUpdate = false;
+            }
+        }
+
+        public async Task DeleteContact(string contactId)
+        {
+            LoadingUpdate = true;
+            try
+            {
+                var res = await _httpClient.DeleteAsync("users/" + this.UserId + "/contacts/" + contactId);
+                Failed = false;
+                LoadingUpdate = false;
+            }
+            catch (System.Exception)
+            {
+                Failed = true;
+                ErrorMessage = "Failed to delete contact";
+                LoadingUpdate = false;
+            }
+        }
+
+        private void LoadCurrentObject(ContactDto[] contacts)
+        {
+            this.Contacts = new List<ContactDto>();
+            foreach (ContactDto contact in contacts)
             {
                 this.Contacts.Add(contact);
             }
         }
-
-
+        public static implicit operator ContactDto(ContactsViewModel contactsViewModel)
+        {
+            return new ContactDto
+            {
+                Firstname = contactsViewModel.AddFirstname,
+                Lastname = contactsViewModel.AddLastname,
+                Address = contactsViewModel.AddAddress,
+            };
+        }
     }
 }

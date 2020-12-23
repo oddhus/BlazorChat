@@ -6,7 +6,7 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Contact, ContactReadDto>();
+        CreateMap<Contact, ContactDto>();
         CreateMap<User, UserReadDto>();
         CreateMap<UserUpdateDto, User>();
         CreateMap<User, UserSettingsDto>();

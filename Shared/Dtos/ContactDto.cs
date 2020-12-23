@@ -1,6 +1,6 @@
 namespace BlazorChat.Shared.Dtos
 {
-    public class ContactReadDto
+    public class ContactDto
     {
         public string Id { get; set; }
         public string Firstname { get; set; }

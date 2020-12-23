@@ -6,8 +6,17 @@ namespace BlazorChat.ViewModels
 {
     public interface IContactsViewModel
     {
-        public string Id { get; set; }
-        public List<ContactReadDto> Contacts { get; set; }
+        public string UserId { get; set; }
+        public string AddFirstname { get; set; }
+        public string AddLastname { get; set; }
+        public string AddAddress { get; set; }
+        public bool LoadingGet { get; set; }
+        public bool LoadingUpdate { get; set; }
+        public bool Failed { get; set; }
+        public string ErrorMessage { get; set; }
+        public List<ContactDto> Contacts { get; set; }
         public Task GetContacts();
+        public Task AddContact();
+        public Task DeleteContact(string contactId);
     }
 }

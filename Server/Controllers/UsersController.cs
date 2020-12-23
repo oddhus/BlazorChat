@@ -72,14 +72,14 @@ namespace BlazorChat.Server.Controllers
         }
 
         [HttpGet("{userId}/contacts")]
-        public ActionResult<IEnumerable<ContactReadDto>> GetUserContacts(string userId)
+        public ActionResult<IEnumerable<ContactDto>> GetUserContacts(string userId)
         {
             if (!HttpContext.User.HasClaim("UserId", userId))
             {
                 return Forbid();
             }
             var user = _userService.GetUserContacts(userId);
-            return Ok(_mapper.Map<IEnumerable<ContactReadDto>>(user.Contacts));
+            return Ok(_mapper.Map<IEnumerable<ContactDto>>(user.Contacts));
         }
     }
 }
