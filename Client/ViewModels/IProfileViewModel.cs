@@ -10,9 +10,10 @@ namespace BlazorChat.ViewModels
         public string Address { get; set; }
         public bool LoadingGet { get; set; }
         public bool LoadingUpdate { get; set; }
+        public bool LoadingFailed { get; set; }
+        public string ErrorMessage { get; set; }
 
         public Task GetProfile();
-
         public Task UpdateProfile();
     }
 }

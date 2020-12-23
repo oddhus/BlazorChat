@@ -13,6 +13,8 @@ namespace BlazorChat.ViewModels
         public string Address { get; set; }
         public bool LoadingGet { get; set; }
         public bool LoadingUpdate { get; set; }
+        public bool LoadingFailed { get; set; }
+        public string ErrorMessage { get; set; }
 
         private HttpClient _httpClient;
 
@@ -49,16 +51,34 @@ namespace BlazorChat.ViewModels
         public async Task GetProfile()
         {
             LoadingGet = true;
-            var profile = await _httpClient.GetFromJsonAsync<UserReadDto>("users/" + this.Id);
-            LoadCurrentObject(profile);
-            LoadingGet = false;
+            try
+            {
+                var profile = await _httpClient.GetFromJsonAsync<UserReadDto>("users/" + this.Id);
+                LoadCurrentObject(profile);
+                LoadingGet = false;
+            }
+            catch (System.Exception)
+            {
+                ErrorMessage = "Failed to get profile";
+                LoadingFailed = true;
+                LoadingGet = false;
+            }
         }
 
         public async Task UpdateProfile()
         {
             LoadingUpdate = true;
-            await _httpClient.PutAsJsonAsync("users/" + this.Id, this);
-            LoadingUpdate = false;
+            try
+            {
+                await _httpClient.PutAsJsonAsync("users/" + this.Id, this);
+                LoadingUpdate = false;
+            }
+            catch (System.Exception)
+            {
+                ErrorMessage = "Failed to update profile";
+                LoadingFailed = true;
+                LoadingUpdate = false;
+            }
         }
 
         private void LoadCurrentObject(ProfileViewModel p)

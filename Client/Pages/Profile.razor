@@ -34,6 +34,12 @@
       </Col>
     </Row>
   </SpaceItem>
+  <SpaceItem>
+    @if (_profileViewModel.LoadingFailed)
+    {
+      <SpaceItem>@_profileViewModel.ErrorMessage</SpaceItem>
+    }
+  </SpaceItem>
   <Space>
     <SpaceItem>
       <Button Type="primary" @onclick="_profileViewModel.UpdateProfile" Loading="_profileViewModel.LoadingUpdate">Update
@@ -45,9 +51,6 @@
     </SpaceItem>
   </Space>
 </Space>
-
-
-<SurveyPrompt Title="How is Blazor working for you?" />
 
 @code {
   [CascadingParameter]

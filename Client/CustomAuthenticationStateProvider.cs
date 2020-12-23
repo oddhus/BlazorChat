@@ -20,22 +20,25 @@ namespace BlazorChat.Client
 
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var currentUser = await _httpClient.GetFromJsonAsync<UserReadDto>("users/me");
-
-            if (currentUser != null && currentUser.Id != null)
+            try
             {
-                //create a claim
-                var claimName = new Claim(ClaimTypes.Name, currentUser.Firstname);
-                var claimId = new Claim("UserId", currentUser.Id);
-                //create claimsIdentity
-                var claimsIdentity = new ClaimsIdentity(new[] { claimName, claimId }, "serverAuth");
-                //create claimsPrincipal
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                var currentUser = await _httpClient.GetFromJsonAsync<UserReadDto>("users/me");
 
-                return new AuthenticationState(claimsPrincipal);
+                if (currentUser != null && currentUser.Id != null)
+                {
+                    //create a claim
+                    var claimName = new Claim(ClaimTypes.Name, currentUser.Firstname);
+                    var claimId = new Claim("UserId", currentUser.Id);
+                    //create claimsIdentity
+                    var claimsIdentity = new ClaimsIdentity(new[] { claimName, claimId }, "serverAuth");
+                    //create claimsPrincipal
+                    var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                    return new AuthenticationState(claimsPrincipal);
+                }
             }
-            else
-                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            catch (System.Exception) { };
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         }
     }
 }
