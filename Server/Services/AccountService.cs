@@ -2,6 +2,7 @@ using BlazorChat.Server.Models;
 using BlazorChat.Shared.Dtos;
 using MongoDB.Driver;
 using System.Linq;
+using BC = BCrypt.Net.BCrypt;
 
 namespace BlazorChat.Server.Services
 {
@@ -19,16 +20,21 @@ namespace BlazorChat.Server.Services
         public Account Login(LoginDto login)
         {
             var account = _accounts.Find<Account>(account => account.Username.Equals(login.Username)).FirstOrDefault();
-            if (account == null || account.Password != login.Password)
+            if (account == null || !BC.Verify(login.Password, account.Password))
             {
                 return null;
             }
             return account;
         }
 
-        public void Register(Account account)
+        public Account Register(string userId, RegisterDto registerDto)
         {
+            Account account = new Account();
+            account.Password = account.Password = BC.HashPassword(registerDto.Password);
+            account.Username = registerDto.Username;
+            account.UserId = userId;
             _accounts.InsertOne(account);
+            return account;
         }
 
         public Account Get(string id)

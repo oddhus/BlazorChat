@@ -39,11 +39,25 @@ namespace BlazorChat.Server.Controllers
             return Ok(account);
         }
 
-        [HttpPost("create")]
-        public IActionResult CreateAccount([FromBody] RegisterDto register)
+        [HttpPost("register")]
+        public async Task<ActionResult<AccountDto>> CreateAccount([FromBody] RegisterDto register)
         {
-            _accountService.Register(_mapper.Map<Account>(register));
-            return NoContent();
+            User user = new User();
+            user = _mapper.Map<User>(register);
+            _userService.CreateUser(user);
+            Account account = _accountService.Register(user.Id, register);
+
+            var claimName = new Claim(ClaimTypes.Name, account.Username);
+            var claimAccount = new Claim("AccountId", account.Id);
+            var clamUser = new Claim("UserId", account.UserId);
+
+            var claimsIdentity = new ClaimsIdentity(new[] { claimName, claimAccount, clamUser }, "serverAuth");
+            //create claimsPrincipal
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+            //Sign In User
+            await HttpContext.SignInAsync(claimsPrincipal);
+
+            return await Task.FromResult(_mapper.Map<AccountDto>(account));
         }
 
         [HttpPost("login")]
@@ -57,10 +71,9 @@ namespace BlazorChat.Server.Controllers
                 return Forbid();
             }
 
-            var user = _userService.GetByAccountId(account.Id);
             var claimName = new Claim(ClaimTypes.Name, account.Username);
             var claimAccount = new Claim("AccountId", account.Id);
-            var clamUser = new Claim("UserId", user.Id);
+            var clamUser = new Claim("UserId", account.UserId);
             //create claimsIdentity
             var claimsIdentity = new ClaimsIdentity(new[] { claimName, claimAccount, clamUser }, "serverAuth");
             //create claimsPrincipal

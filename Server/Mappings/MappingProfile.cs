@@ -10,7 +10,11 @@ public class MappingProfile : Profile
         CreateMap<User, UserReadDto>();
         CreateMap<UserUpdateDto, User>();
         CreateMap<User, UserSettingsDto>();
+
         CreateMap<RegisterDto, Account>();
+        CreateMap<RegisterDto, User>();
+        CreateMap<RegisterDto, LoginDto>();
+
         CreateMap<Account, AccountDto>();
     }
 }

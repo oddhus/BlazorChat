@@ -1,0 +1,46 @@
+@page "/register"
+@using BlazorChat.ViewModels
+@inject IRegisterViewModel _registerViewModel
+@inject NavigationManager _navigationManager
+
+<Form Model="@_registerViewModel" LabelCol="new ColLayoutParam { Span = 5 }"
+    WrapperCol="new ColLayoutParam{ Span = 16 }" OnFinish="RegisterUser">
+    <FormItem Label="Username">
+        <Input @bind-Value="@context.Username" />
+    </FormItem>
+    <FormItem Label="Password">
+        <InputPassword @bind-Value="@context.Password" />
+    </FormItem>
+    <FormItem Label="Repeat password">
+        <InputPassword @bind-Value="@context.RepeatPassword" />
+    </FormItem>
+    <FormItem Label="Firstname">
+        <Input @bind-Value="@context.Firstname" />
+    </FormItem>
+    <FormItem Label="Lastname">
+        <Input @bind-Value="@context.Lastname" />
+    </FormItem>
+    <FormItem Label="Address">
+        <Input @bind-Value="@context.Address" />
+    </FormItem>
+    <FormItem Label="Dark Theme">
+        <Switch @bind-Value="@context.DarkTheme" />
+    </FormItem>
+    <FormItem Label="Notifications">
+        <Switch @bind-Value="@context.Notifications" />
+    </FormItem>
+    <FormItem WrapperCol="new ColLayoutParam{ Offset = 8, Span = 16 }">
+        <Button HtmlType="submit">
+            Submit
+        </Button>
+    </FormItem>
+</Form>
+
+@code
+{
+    public async Task RegisterUser()
+    {
+        await _registerViewModel.Register();
+        _navigationManager.NavigateTo("/profile", true);
+    }
+}

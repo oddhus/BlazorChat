@@ -20,7 +20,7 @@ namespace BlazorChat.Client
 
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            UserReadDto currentUser = await _httpClient.GetFromJsonAsync<UserReadDto>("users/me");
+            var currentUser = await _httpClient.GetFromJsonAsync<UserReadDto>("users/me");
 
             if (currentUser != null && currentUser.Id != null)
             {

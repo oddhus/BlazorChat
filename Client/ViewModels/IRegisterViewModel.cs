@@ -1,19 +1,18 @@
-using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
-namespace BlazorChat.Shared.Dtos
+namespace BlazorChat.ViewModels
 {
-    public class RegisterDto
+    public interface IRegisterViewModel
     {
-        [Required]
         public string Username { get; set; }
-        [Required]
         public string Password { get; set; }
-        [Required]
+        public string RepeatPassword { get; set; }
         public string Firstname { get; set; }
-        [Required]
         public string Lastname { get; set; }
         public string Address { get; set; }
         public bool DarkTheme { get; set; }
         public bool Notifications { get; set; }
+        public bool LoadingOnSubmit { get; set; }
+        public Task Register();
     }
 }

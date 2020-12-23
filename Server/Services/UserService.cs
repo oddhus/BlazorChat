@@ -19,14 +19,17 @@ namespace BlazorChat.Server.Services
         public User Get(string id) =>
             _users.Find<User>(user => user.Id == id).FirstOrDefault();
 
-        public User GetByAccountId(string accountId) =>
-            _users.Find<User>(user => user.AccountId == accountId).FirstOrDefault();
 
         public User GetUserSettings(string id)
         {
             var fieldsBuilder = Builders<User>.Projection;
             var fields = fieldsBuilder.Include(u => u.DarkTheme).Include(u => u.Notifications);
             return _users.Find<User>(u => u.Id == id).Project<User>(fields).FirstOrDefault();
+        }
+
+        public void CreateUser(User user)
+        {
+            _users.InsertOne(user);
         }
 
         public void Update(string id, User user, UserUpdateDto userIn)
