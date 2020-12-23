@@ -13,7 +13,7 @@ namespace BlazorChat.ViewModels
         public string Address { get; set; }
         public bool LoadingGet { get; set; }
         public bool LoadingUpdate { get; set; }
-        public bool LoadingFailed { get; set; }
+        public bool Failed { get; set; }
         public string ErrorMessage { get; set; }
 
         private HttpClient _httpClient;
@@ -55,12 +55,13 @@ namespace BlazorChat.ViewModels
             {
                 var profile = await _httpClient.GetFromJsonAsync<UserReadDto>("users/" + this.Id);
                 LoadCurrentObject(profile);
+                Failed = false;
                 LoadingGet = false;
             }
             catch (System.Exception)
             {
                 ErrorMessage = "Failed to get profile";
-                LoadingFailed = true;
+                Failed = true;
                 LoadingGet = false;
             }
         }
@@ -71,12 +72,13 @@ namespace BlazorChat.ViewModels
             try
             {
                 await _httpClient.PutAsJsonAsync("users/" + this.Id, this);
+                Failed = false;
                 LoadingUpdate = false;
             }
             catch (System.Exception)
             {
                 ErrorMessage = "Failed to update profile";
-                LoadingFailed = true;
+                Failed = true;
                 LoadingUpdate = false;
             }
         }

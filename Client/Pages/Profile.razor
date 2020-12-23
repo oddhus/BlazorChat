@@ -35,9 +35,9 @@
     </Row>
   </SpaceItem>
   <SpaceItem>
-    @if (_profileViewModel.LoadingFailed)
+    @if (_profileViewModel.Failed)
     {
-      <SpaceItem>@_profileViewModel.ErrorMessage</SpaceItem>
+      <SpaceItem><Text Type="danger">Error: @_profileViewModel.ErrorMessage</Text></SpaceItem>
     }
   </SpaceItem>
   <Space>
