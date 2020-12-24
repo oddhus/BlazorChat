@@ -4,6 +4,7 @@ using AutoMapper;
 using BlazorChat.Server.Services;
 using System.Collections.Generic;
 using System.Linq;
+using BlazorChat.Server.Models;
 
 namespace BlazorChat.Server.Controllers
 {
@@ -79,6 +80,17 @@ namespace BlazorChat.Server.Controllers
                 return Forbid();
             }
             var user = _userService.GetUserContacts(userId);
+            return Ok(_mapper.Map<IEnumerable<ContactDto>>(user.Contacts));
+        }
+
+        [HttpPost("{userId}/contacts")]
+        public ActionResult<IEnumerable<ContactDto>> AddUserContacts(string userId, [FromBody] ContactDto contactDto)
+        {
+            if (!HttpContext.User.HasClaim("UserId", userId))
+            {
+                return Forbid();
+            }
+            var user = _userService.AddUserContacts(userId, _mapper.Map<Contact>(contactDto));
             return Ok(_mapper.Map<IEnumerable<ContactDto>>(user.Contacts));
         }
     }

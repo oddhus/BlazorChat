@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BlazorChat.Shared.Dtos;
+using Microsoft.AspNetCore.Components;
 
 namespace BlazorChat.ViewModels
 {

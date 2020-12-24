@@ -3,6 +3,9 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using BlazorChat.Shared.Dtos;
+using Microsoft.AspNetCore.Components;
+
+using MongoDB.Bson.IO;
 
 namespace BlazorChat.ViewModels
 {
@@ -40,7 +43,8 @@ namespace BlazorChat.ViewModels
             try
             {
                 ContactDto contactDto = this;
-                var res = await _httpClient.PostAsJsonAsync("users/" + this.UserId + "/contacts", contactDto);
+                var response = await _httpClient.PostAsJsonAsync<ContactDto>("users/" + this.UserId + "/contacts", contactDto);
+                LoadCurrentObject(await response.Content.ReadFromJsonAsync<ContactDto[]>());
                 Failed = false;
                 LoadingUpdate = false;
             }
@@ -77,6 +81,7 @@ namespace BlazorChat.ViewModels
                 this.Contacts.Add(contact);
             }
         }
+
         public static implicit operator ContactDto(ContactsViewModel contactsViewModel)
         {
             return new ContactDto

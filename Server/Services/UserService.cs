@@ -1,6 +1,7 @@
 using BlazorChat.Server.Models;
 using BlazorChat.Shared.Dtos;
 using MongoDB.Driver;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BlazorChat.Server.Services
@@ -29,6 +30,7 @@ namespace BlazorChat.Server.Services
 
         public void CreateUser(User user)
         {
+            user.Contacts = new List<Contact>();
             _users.InsertOne(user);
         }
 
@@ -55,6 +57,18 @@ namespace BlazorChat.Server.Services
             var fieldsBuilder = Builders<User>.Projection;
             var fields = fieldsBuilder.Include(u => u.Contacts);
             return _users.Find<User>(u => u.Id == userId).Project<User>(fields).FirstOrDefault();
+        }
+
+        public User AddUserContacts(string userId, Contact contact)
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<User>.Update.Push<Contact>(u => u.Contacts, contact);
+            var opts = new FindOneAndUpdateOptions<User>()
+            {
+                IsUpsert = false,
+                ReturnDocument = ReturnDocument.After
+            };
+            return _users.FindOneAndUpdate(filter, update, opts);
         }
     }
 }

@@ -9,6 +9,24 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
+<Form LabelCol="new ColLayoutParam { Span = 4 }" WrapperCol="new ColLayoutParam { Span = 10 }"
+  Model="@_contactsViewModel" OnFinish="@_contactsViewModel.AddContact">
+  <FormItem Label="Firstname">
+    <Input @bind-Value="@context.AddFirstname" />
+  </FormItem>
+  <FormItem Label="Lastname">
+    <Input @bind-Value="@context.AddLastname" />
+  </FormItem>
+  <FormItem Label="Address">
+    <Input @bind-Value="@context.AddAddress" />
+  </FormItem>
+  <FormItem WrapperCol="new ColLayoutParam { Span = 10, Offset=4 }">
+    <Button Type="@ButtonType.Primary" HtmlType="submit">
+      Add Contact
+    </Button>
+  </FormItem>
+</Form>
+
 @if (_contactsViewModel.Contacts == null)
 {
   <div class="spinnerContainer">
