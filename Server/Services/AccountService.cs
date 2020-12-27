@@ -1,6 +1,7 @@
 using BlazorChat.Server.Models;
 using BlazorChat.Shared.Dtos;
 using MongoDB.Driver;
+using System;
 using System.Linq;
 using BC = BCrypt.Net.BCrypt;
 
@@ -16,6 +17,11 @@ namespace BlazorChat.Server.Services
             _accounts = database.GetCollection<Account>("accounts");
         }
 
+        public bool AccountExists(string username)
+        {
+            var filter = Builders<Account>.Filter.Eq(a => a.Username, username);
+            return _accounts.Find<Account>(filter).FirstOrDefault() != null;
+        }
 
         public Account Login(LoginDto login)
         {
@@ -31,7 +37,7 @@ namespace BlazorChat.Server.Services
         {
             Account account = new Account();
             account.Password = account.Password = BC.HashPassword(registerDto.Password);
-            account.Username = registerDto.Username;
+            account.Username = registerDto.Username.ToLower();
             account.UserId = userId;
             _accounts.InsertOne(account);
             return account;

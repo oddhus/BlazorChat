@@ -15,9 +15,13 @@ namespace BlazorChat.ViewModels
         public bool LoadingUpdate { get; set; }
         public bool Failed { get; set; }
         public string ErrorMessage { get; set; }
+        public string SearchFirstname { get; set; }
+        public string SearchLastname { get; set; }
         public List<ContactDto> Contacts { get; set; }
+        public List<ContactDto> SearchResult { get; set; }
         public Task GetContacts();
-        public Task AddContact();
+        public Task AddContact(string id);
+        public Task FindUsers();
         public Task DeleteContact(string contactId);
     }
 }

@@ -22,13 +22,13 @@ namespace BlazorChat.Client
         {
             try
             {
-                var currentUser = await _httpClient.GetFromJsonAsync<UserReadDto>("users/me");
+                var currentUser = await _httpClient.GetFromJsonAsync<AccountDto>("accounts/me");
 
-                if (currentUser != null && currentUser.Id != null)
+                if (currentUser != null && currentUser.UserId != null)
                 {
                     //create a claim
-                    var claimName = new Claim(ClaimTypes.Name, currentUser.Firstname);
-                    var claimId = new Claim("UserId", currentUser.Id);
+                    var claimName = new Claim(ClaimTypes.Name, currentUser.Username);
+                    var claimId = new Claim("UserId", currentUser.UserId);
                     //create claimsIdentity
                     var claimsIdentity = new ClaimsIdentity(new[] { claimName, claimId }, "serverAuth");
                     //create claimsPrincipal

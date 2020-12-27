@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using BlazorChat.Shared.Dtos;
 using Microsoft.AspNetCore.Components;
 
-using MongoDB.Bson.IO;
-
 namespace BlazorChat.ViewModels
 {
     public class ContactsViewModel : IContactsViewModel
@@ -16,10 +14,13 @@ namespace BlazorChat.ViewModels
         public string AddFirstname { get; set; }
         public string AddLastname { get; set; }
         public string AddAddress { get; set; }
+        public string SearchFirstname { get; set; }
+        public string SearchLastname { get; set; }
         public bool LoadingGet { get; set; }
         public bool LoadingUpdate { get; set; }
         public bool Failed { get; set; }
         public string ErrorMessage { get; set; }
+        public List<ContactDto> SearchResult { get; set; }
         public List<ContactDto> Contacts { get; set; }
         private HttpClient _httpClient;
 
@@ -31,18 +32,26 @@ namespace BlazorChat.ViewModels
         {
             _httpClient = httpClient;
         }
+
+        public async Task FindUsers()
+        {
+            var response = await _httpClient.GetFromJsonAsync<ContactDto[]>("users/" +
+                "?firstname=" + this.SearchFirstname + "&lastname=" + this.SearchLastname);
+            LoadSearchResult(response);
+        }
+
         public async Task GetContacts()
         {
             var response = await _httpClient.GetFromJsonAsync<ContactDto[]>("users/" + this.UserId + "/contacts");
             LoadCurrentObject(response);
         }
 
-        public async Task AddContact()
+        public async Task AddContact(string id)
         {
             LoadingUpdate = true;
             try
             {
-                ContactDto contactDto = this;
+                ContactDto contactDto = this.SearchResult.Find(contact => contact.Id == id);
                 var response = await _httpClient.PostAsJsonAsync<ContactDto>("users/" + this.UserId + "/contacts", contactDto);
                 LoadCurrentObject(await response.Content.ReadFromJsonAsync<ContactDto[]>());
                 Failed = false;
@@ -70,6 +79,15 @@ namespace BlazorChat.ViewModels
                 Failed = true;
                 ErrorMessage = "Failed to delete contact";
                 LoadingUpdate = false;
+            }
+        }
+
+        private void LoadSearchResult(ContactDto[] users)
+        {
+            this.SearchResult = new List<ContactDto>();
+            foreach (ContactDto user in users)
+            {
+                this.SearchResult.Add(user);
             }
         }
 

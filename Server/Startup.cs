@@ -12,6 +12,8 @@ using System;
 using BlazorChat.Server.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using BlazorChat.Server.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BlazorChat.Server
 {
@@ -28,12 +30,14 @@ namespace BlazorChat.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR();
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddSingleton<UserService>();
             services.AddSingleton<AccountService>();
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
             services.AddAuthentication(opt =>
             {
@@ -45,11 +49,19 @@ namespace BlazorChat.Server
                 var uri = s.GetRequiredService<IConfiguration>()["MongoUri"];
                 return new MongoClient(uri);
             });
+
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseResponseCompression();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -74,6 +86,8 @@ namespace BlazorChat.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<ChatPerson>("/chat");
                 endpoints.MapFallbackToFile("index.html");
             });
         }

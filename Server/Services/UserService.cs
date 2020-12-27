@@ -31,7 +31,24 @@ namespace BlazorChat.Server.Services
         public void CreateUser(User user)
         {
             user.Contacts = new List<Contact>();
+            user.Firstname = user.Firstname.ToLower();
+            user.Lastname = user.Lastname.ToLower();
+            user.Address = user.Address.ToLower();
             _users.InsertOne(user);
+        }
+
+        public List<User> SearchUsers(string firstname, string lastname)
+        {
+            var filter = Builders<User>.Filter.Empty;
+            if (!string.IsNullOrEmpty(firstname))
+            {
+                filter &= (Builders<User>.Filter.Eq(x => x.Firstname, firstname));
+            }
+            if (!string.IsNullOrEmpty(lastname))
+            {
+                filter &= (Builders<User>.Filter.Eq(x => x.Lastname, lastname));
+            }
+            return _users.Find(filter).Limit(10).ToList();
         }
 
         public void Update(string id, User user, UserUpdateDto userIn)
@@ -62,7 +79,7 @@ namespace BlazorChat.Server.Services
         public User AddUserContacts(string userId, Contact contact)
         {
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
-            var update = Builders<User>.Update.Push<Contact>(u => u.Contacts, contact);
+            var update = Builders<User>.Update.AddToSet<Contact>(u => u.Contacts, contact);
             var opts = new FindOneAndUpdateOptions<User>()
             {
                 IsUpsert = false,

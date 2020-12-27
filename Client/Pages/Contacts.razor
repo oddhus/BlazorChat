@@ -7,25 +7,44 @@
 
 <h1>Contacts</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
+@if (@openAddContact)
+{
+  <Form WrapperCol="new ColLayoutParam { Span = 10 }" Model="@_contactsViewModel"
+    OnFinish="@_contactsViewModel.FindUsers">
+    <FormItem Label="Firstname">
+      <Input @bind-Value="@context.SearchFirstname" />
+    </FormItem>
+    <FormItem Label="Lastname">
+      <Input @bind-Value="@context.SearchLastname" />
+    </FormItem>
+    <FormItem WrapperCol="new ColLayoutParam { Span = 10}">
+      <Button OnClick="(e)=>{openAddContact = false;}">Cancel</Button>
+      <Button Type="@ButtonType.Primary" HtmlType="submit">
+        Search
+      </Button>
+    </FormItem>
+  </Form>
+}
 
-<Form LabelCol="new ColLayoutParam { Span = 4 }" WrapperCol="new ColLayoutParam { Span = 10 }"
-  Model="@_contactsViewModel" OnFinish="@_contactsViewModel.AddContact">
-  <FormItem Label="Firstname">
-    <Input @bind-Value="@context.AddFirstname" />
-  </FormItem>
-  <FormItem Label="Lastname">
-    <Input @bind-Value="@context.AddLastname" />
-  </FormItem>
-  <FormItem Label="Address">
-    <Input @bind-Value="@context.AddAddress" />
-  </FormItem>
-  <FormItem WrapperCol="new ColLayoutParam { Span = 10, Offset=4 }">
-    <Button Type="@ButtonType.Primary" HtmlType="submit">
-      Add Contact
-    </Button>
-  </FormItem>
-</Form>
+@if (_contactsViewModel.SearchResult != null && openAddContact)
+{
+  <AntList Bordered DataSource="@_contactsViewModel.SearchResult" Size="small">
+    <Header>Result</Header>
+    <ChildContent Context="item">
+      <ListItem>
+        <span><Text Mark>
+            <p>@item.Firstname @item.Lastname</p>
+          </Text></span><Button OnClick="(e)=>{_contactsViewModel.AddContact(item.Id);}">Add</Button>
+      </ListItem>
+    </ChildContent>
+    <Footer>Footer</Footer>
+  </AntList>
+}
+
+@if (!openAddContact)
+{
+  <Button OnClick="(e)=>{openAddContact = true;}">Add Contact</Button>
+}
 
 @if (_contactsViewModel.Contacts == null)
 {
@@ -76,4 +95,5 @@ else
       NavigationManager.NavigateTo("/");
     }
   }
+  [Parameter] public bool openAddContact { get; set; }
 }

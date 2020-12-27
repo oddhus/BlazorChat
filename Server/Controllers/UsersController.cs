@@ -5,6 +5,7 @@ using BlazorChat.Server.Services;
 using System.Collections.Generic;
 using System.Linq;
 using BlazorChat.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorChat.Server.Controllers
 {
@@ -22,16 +23,11 @@ namespace BlazorChat.Server.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("me")]
-        public ActionResult<UserReadDto> Getme()
+        [HttpGet]
+        public ActionResult<IEnumerable<ContactDto>> SearchUsers([FromQuery] string firstname, [FromQuery] string lastname)
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return new UserReadDto();
-            }
-            string id = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
-            var user = _userService.Get(id);
-            return Ok(_mapper.Map<UserReadDto>(user));
+            var users = _userService.SearchUsers(firstname, lastname);
+            return Ok(_mapper.Map<IEnumerable<ContactDto>>(users));
         }
 
         [HttpGet("{userId}")]

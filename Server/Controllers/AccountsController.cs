@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 
 namespace BlazorChat.Server.Controllers
 {
@@ -28,20 +29,27 @@ namespace BlazorChat.Server.Controllers
             _logger = logger;
         }
 
+
         [HttpGet("me")]
-        public ActionResult<AccountDto> GetMe()
+        public ActionResult<AccountDto> Getme()
         {
-            AccountDto account = new AccountDto();
-            if (User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated)
             {
-                account.Username = User.FindFirstValue(ClaimTypes.Name);
+                return new AccountDto();
             }
-            return Ok(account);
+            string id = User.Claims.FirstOrDefault(c => c.Type == "AccountId")?.Value;
+            var account = _accountService.Get(id);
+            return Ok(_mapper.Map<AccountDto>(account));
         }
 
         [HttpPost("register")]
         public async Task<ActionResult<AccountDto>> CreateAccount([FromBody] RegisterDto register)
         {
+            if (_accountService.AccountExists(register.Username))
+            {
+                return null;
+            }
+
             User user = new User();
             user = _mapper.Map<User>(register);
             _userService.CreateUser(user);
