@@ -16,7 +16,6 @@ namespace BlazorChat.Server.Services
             _users = database.GetCollection<User>("users");
         }
 
-
         public User Get(string id) =>
             _users.Find<User>(user => user.Id == id).FirstOrDefault();
 
@@ -39,13 +38,16 @@ namespace BlazorChat.Server.Services
 
         public List<User> SearchUsers(string firstname, string lastname)
         {
+
             var filter = Builders<User>.Filter.Empty;
             if (!string.IsNullOrEmpty(firstname))
             {
+                firstname = firstname.ToLower();
                 filter &= (Builders<User>.Filter.Eq(x => x.Firstname, firstname));
             }
             if (!string.IsNullOrEmpty(lastname))
             {
+                lastname = lastname.ToLower();
                 filter &= (Builders<User>.Filter.Eq(x => x.Lastname, lastname));
             }
             return _users.Find(filter).Limit(10).ToList();
@@ -80,6 +82,32 @@ namespace BlazorChat.Server.Services
         {
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
             var update = Builders<User>.Update.AddToSet<Contact>(u => u.Contacts, contact);
+            var opts = new FindOneAndUpdateOptions<User>()
+            {
+                IsUpsert = false,
+                ReturnDocument = ReturnDocument.After
+            };
+            return _users.FindOneAndUpdate(filter, update, opts);
+        }
+
+        public User UpdateUserContacts(string userId, string contactId, string chatId)
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId)
+                & Builders<User>.Filter.ElemMatch(x => x.Contacts, Builders<Contact>.Filter.Eq(x => x.Id, contactId));
+            var update = Builders<User>.Update.Set(c => c.Contacts[-1].ChatId, chatId);
+            var opts = new FindOneAndUpdateOptions<User>()
+            {
+                IsUpsert = false,
+                ReturnDocument = ReturnDocument.After
+            };
+            return _users.FindOneAndUpdate(filter, update, opts);
+        }
+
+        public User RemoveUserContacts(string userId, string contactId)
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var filterContacts = Builders<Contact>.Filter.Eq(c => c.Id, contactId);
+            var update = Builders<User>.Update.PullFilter(u => u.Contacts, filterContacts);
             var opts = new FindOneAndUpdateOptions<User>()
             {
                 IsUpsert = false,

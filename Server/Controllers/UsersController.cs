@@ -89,5 +89,16 @@ namespace BlazorChat.Server.Controllers
             var user = _userService.AddUserContacts(userId, _mapper.Map<Contact>(contactDto));
             return Ok(_mapper.Map<IEnumerable<ContactDto>>(user.Contacts));
         }
+
+        [HttpDelete("{userId}/contacts/{contactId}")]
+        public ActionResult DeleteContact(string userId, string contactId)
+        {
+            if (!HttpContext.User.HasClaim("UserId", userId))
+            {
+                return Forbid();
+            }
+            var user = _userService.RemoveUserContacts(userId, contactId);
+            return Ok();
+        }
     }
 }

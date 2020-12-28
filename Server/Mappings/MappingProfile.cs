@@ -19,5 +19,10 @@ public class MappingProfile : Profile
         CreateMap<RegisterDto, LoginDto>();
 
         CreateMap<Account, AccountDto>();
+
+        CreateMap<MessageDto, Message>();
+        CreateMap<Message, MessageDto>();
+
+        CreateMap<Chat, ChatDto>();
     }
 }

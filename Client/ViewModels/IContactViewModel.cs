@@ -22,6 +22,7 @@ namespace BlazorChat.ViewModels
         public Task GetContacts();
         public Task AddContact(string id);
         public Task FindUsers();
+        public Task StartChat(string contactId);
         public Task DeleteContact(string contactId);
     }
 }

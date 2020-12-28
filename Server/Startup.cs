@@ -37,6 +37,7 @@ namespace BlazorChat.Server
 
             services.AddSingleton<UserService>();
             services.AddSingleton<AccountService>();
+            services.AddSingleton<ChatService>();
             services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
             services.AddAuthentication(opt =>

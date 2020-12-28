@@ -28,6 +28,7 @@ namespace BlazorChat.Client
             builder.Services.AddTransient<IContactsViewModel, ContactsViewModel>();
             builder.Services.AddTransient<ILoginViewModel, LoginViewModel>();
             builder.Services.AddTransient<IRegisterViewModel, RegisterViewModel>();
+            builder.Services.AddTransient<IChatPersonViewModel, ChatPersonViewModel>();
 
             builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 

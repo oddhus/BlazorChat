@@ -37,7 +37,6 @@
           </Text></span><Button OnClick="(e)=>{_contactsViewModel.AddContact(item.Id);}">Add</Button>
       </ListItem>
     </ChildContent>
-    <Footer>Footer</Footer>
   </AntList>
 }
 
@@ -58,11 +57,20 @@ else
     <ListItem>
       <ListItemMeta Avatar="avatar" Description="@context.Address">
         <TitleTemplate>
-          <a href="/chat/@context.Firstname">@context.Firstname @context.Lastname</a>
-        </TitleTemplate>
-      </ListItemMeta>
-    </ListItem>
-  </AntList>
+          @if (@context.ChatId == null)
+        {
+          <span>@context.Firstname @context.Lastname</span>
+          <Button OnClick="(e)=>{_contactsViewModel.StartChat(context.Id);}">Start chat</Button>
+        }
+        else
+        {
+          <span><a href="/chat/@context.ChatId">@context.Firstname @context.Lastname</a></span>
+        }
+        <Button OnClick="(e)=>{_contactsViewModel.DeleteContact(context.Id);}">Remove</Button>
+      </TitleTemplate>
+    </ListItemMeta>
+  </ListItem>
+</AntList>
 }
 
 <style>

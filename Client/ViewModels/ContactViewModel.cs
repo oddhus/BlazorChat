@@ -70,7 +70,27 @@ namespace BlazorChat.ViewModels
             LoadingUpdate = true;
             try
             {
-                var res = await _httpClient.DeleteAsync("users/" + this.UserId + "/contacts/" + contactId);
+                await _httpClient.DeleteAsync("users/" + this.UserId + "/contacts/" + contactId);
+                this.Contacts.RemoveAll(c => c.Id == contactId);
+                Failed = false;
+                LoadingUpdate = false;
+            }
+            catch (System.Exception)
+            {
+                Failed = true;
+                ErrorMessage = "Failed to delete contact";
+                LoadingUpdate = false;
+            }
+        }
+
+        public async Task StartChat(string contactId)
+        {
+            LoadingUpdate = true;
+            try
+            {
+                var res = await _httpClient.PostAsJsonAsync<ContactDto>("chats/" + this.UserId + "/start/" + contactId, null);
+                var contact = this.Contacts.Find(c => c.Id == contactId);
+                contact = await res.Content.ReadFromJsonAsync<ContactDto>();
                 Failed = false;
                 LoadingUpdate = false;
             }
