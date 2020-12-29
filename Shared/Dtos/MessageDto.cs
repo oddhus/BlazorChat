@@ -13,6 +13,7 @@ namespace BlazorChat.Shared.Dtos
         {
             Sender = sender;
             Text = text;
+            Sent = DateTime.Now;
         }
     }
 }

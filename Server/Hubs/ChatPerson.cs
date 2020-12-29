@@ -7,10 +7,9 @@ namespace BlazorChat.Server
     public class ChatPerson : Hub
     {
 
-        public async Task Broadcast(string userId, string message)
+        public async Task Broadcast(string userId, string senderName, string message)
         {
-            await Clients.Caller.SendAsync("Broadcast", userId, message);
-            await Clients.User(userId).SendAsync("Broadcast", userId, message);
+            await Clients.User(userId).SendAsync("Broadcast", userId, senderName, message);
         }
 
         public override Task OnConnectedAsync()

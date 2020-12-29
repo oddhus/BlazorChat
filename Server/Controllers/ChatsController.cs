@@ -4,6 +4,8 @@ using AutoMapper;
 using BlazorChat.Server.Services;
 using BlazorChat.Server.Models;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
 
 namespace BlazorChat.Server.Controllers
 {
@@ -26,7 +28,19 @@ namespace BlazorChat.Server.Controllers
         [HttpGet("{chatId}")]
         public ActionResult<ChatDto> GetMessages(string chatId)
         {
-            return Ok(_mapper.Map<ChatDto>(_chatService.GetChat(chatId)));
+            var userId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            if (userId == null)
+            {
+                return StatusCode(403);
+            }
+
+            var chat = _chatService.GetChat(chatId);
+            if (chat == null || !(userId == chat.ParticipantA || userId == chat.ParticipantB))
+            {
+                return StatusCode(403);
+            }
+
+            return Ok(_mapper.Map<ChatDto>(chat));
         }
 
         [HttpPost("{userId}/start/{recipientId}")]

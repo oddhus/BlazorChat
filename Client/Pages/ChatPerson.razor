@@ -6,37 +6,53 @@
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.SignalR.Client;
 
-@if(_chatPersonViewModel.LoadingGet)
+@if (_chatPersonViewModel.LoadingGet)
 {
-    <Spin />
-} else {
-// banner to show current user
-    <div class="alert alert-secondary mt-4" role="alert">
-        <span class="oi oi-person mr-2" aria-hidden="true"></span>
-        <span>You are connected as <b>@_chatPersonViewModel.SenderName</b></span>
-        <button class="btn btn-sm btn-warning ml-md-auto" @onclick="@DisconnectAsync">Disconnect</button>
-    </div>
-    // display messages
-    <div id="scrollbox">
-        @foreach (var message in _chatPersonViewModel.Messages)
-        {
-            @if (message.IsNotice)
-            {
-                <div class="alert alert-info">@message.Text</div>
-            }
-            else
-            {
-                <div>
-                    <div class="user">@message.Sender</div>
-                    <div class="msg">@message.Text</div>
-                </div>
-            }
+  <Spin />
+}
+else
+{
+  // banner to show current user
+  <div class="alert alert-secondary mt-4" role="alert">
+    <span class="oi oi-person mr-2" aria-hidden="true"></span>
+    <span>You are connected as <b>@_chatPersonViewModel.SenderName</b></span>
+    <button class="btn btn-sm btn-warning ml-md-auto" @onclick="@DisconnectAsync">Disconnect</button>
+  </div>
+  // display messages
+  <div id="scrollbox">
+    @if(_chatPersonViewModel.Messages != null && _chatPersonViewModel.Messages.Count > 0) {
+      @foreach (var message in _chatPersonViewModel.Messages)
+      {
+        @if (message.IsNotice)
+      {
+        <div class="alert alert-info">@message.Text</div>
+      } else {
+        <Comment Author="@message.Sender" Avatar="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+          Content="@message.Text" Datetime="@message.Sent.ToString("dddd, dd MM yyyy HH:mm:ss")">
+        </Comment>
         }
-        <hr />
-        <textarea class="input-lg" placeholder="enter your comment" @bind="@_chatPersonViewModel.Text"></textarea>
-        <button class="btn btn-default" @onclick="@(() => SendAsync(_chatPersonViewModel.Text))">Send</button>
-    </div>
-}  
+      }
+    } 
+    else if (!string.IsNullOrEmpty(@_chatPersonViewModel.ErrorMessage))
+    {
+      <AntDesign.Text Type="danger">@_chatPersonViewModel.ErrorMessage</AntDesign.Text>
+    }
+    else
+    {
+      <AntDesign.Text>No messages</AntDesign.Text>
+    }
+    <hr />
+    <Row Align="bottom">
+      <AntDesign.Col Md="16" Lg="14" Xl="12">
+        <TextArea Placeholder="Message" MinRows="3" MaxRows="5" @bind-Value="@_chatPersonViewModel.Text"/>
+      </AntDesign.Col>
+      <AntDesign.Col Md="8" Lg="6" Offset="1">
+          <Button Type="primary" @onclick="@(() => SendAsync(_chatPersonViewModel.Text))">Send</Button>
+        </AntDesign.Col>
+    </Row>
+    <hr />
+  </div>
+}
 
 @code {
   [Parameter]
@@ -49,6 +65,8 @@
 
   protected override async Task OnInitializedAsync()
   {
+    _chatPersonViewModel.ErrorMessage = string.Empty;
+
     var authState = await authenticationStateTask;
     var user = authState.User;
 
@@ -56,31 +74,34 @@
     {
       try
       {
-      var userId = user.FindFirst(c => c.Type == "UserId")?.Value;
-      _chatPersonViewModel.SenderId = userId;
-      _chatPersonViewModel.ChatId = Id;
-      await _chatPersonViewModel.GetMessages();
-      
-      // Start chatting and force refresh UI.
-      await Task.Delay(1);
+        var userId = user.FindFirst(c => c.Type == "UserId")?.Value;
+        _chatPersonViewModel.SenderName = user.Identity.Name;
+        _chatPersonViewModel.SenderId = userId;
+        _chatPersonViewModel.ChatId = Id;
+        await _chatPersonViewModel.GetMessages();
 
-      string baseUrl = navigationManager.BaseUri;
+        // Start chatting and force refresh UI.
+        await Task.Delay(1);
+
+        string baseUrl = navigationManager.BaseUri;
 
         _hubUrl = baseUrl.TrimEnd('/') + "/chat";
 
         _hubConnection = new HubConnectionBuilder()
-        .WithUrl(_hubUrl)
-        .Build();
+          .WithUrl(_hubUrl)
+          .Build();
 
-        _hubConnection.On<string, string>("Broadcast", BroadcastMessage);
+        _hubConnection.On<string, string, string>("Broadcast", BroadcastMessage);
 
         await _hubConnection.StartAsync();
 
-        await SendAsync($"[Notice] test joined chat room.");
+        //await SendAsync($"[Notice] {_chatPersonViewModel.SenderName} joined chat room.");
       }
       catch (Exception e)
       {
-         _chatPersonViewModel.ErrorMessage = $"ERROR: Failed to start chat client: {e.Message}";
+        _chatPersonViewModel.ErrorMessage = $"ERROR: Failed to start chat client: {e.Message}";
+        _chatPersonViewModel.LoadingGet = false;
+
       }
     }
     else
@@ -88,34 +109,34 @@
       NavigationManager.NavigateTo("/");
     }
   }
-    // flag to indicate chat status
+  // flag to indicate chat status
 
-    private void BroadcastMessage(string name, string message)
+  private void BroadcastMessage(string reciverId, string senderName, string message)
+  {
+    _chatPersonViewModel.Messages.Add(new MessageDto(senderName, message));
+    // Inform blazor the UI needs updating
+    StateHasChanged();
+  }
+
+  private async Task DisconnectAsync()
+  {
+    await SendAsync($"[Notice] {_chatPersonViewModel.SenderName} left chat room.");
+
+    await _hubConnection.StopAsync();
+    await _hubConnection.DisposeAsync();
+
+    _hubConnection = null;
+  }
+
+  private async Task SendAsync(string message)
+  {
+    if (!string.IsNullOrWhiteSpace(message))
     {
-      _chatPersonViewModel.Messages.Add(new MessageDto(_chatPersonViewModel.RecieverId, message));
-      // Inform blazor the UI needs updating
-      StateHasChanged();
+      await _chatPersonViewModel.SendMessage();
+      await _hubConnection.SendAsync("Broadcast", _chatPersonViewModel.RecieverId, _chatPersonViewModel.SenderName, message);
+
+      _chatPersonViewModel.Text = string.Empty;
     }
-
-    private async Task DisconnectAsync()
-    {
-        await SendAsync($"[Notice] test left chat room.");
-
-        await _hubConnection.StopAsync();
-        await _hubConnection.DisposeAsync();
-
-        _hubConnection = null;
-    }
-
-    private async Task SendAsync(string message)
-    {
-      if (!string.IsNullOrWhiteSpace(message))
-      {
-        await _chatPersonViewModel.SendMessage();
-        await _hubConnection.SendAsync("Broadcast", _chatPersonViewModel.RecieverId, message);
-
-        _chatPersonViewModel.Text = string.Empty;
-      }
-    }
+  }
 
 }

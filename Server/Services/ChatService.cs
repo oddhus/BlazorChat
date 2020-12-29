@@ -18,14 +18,17 @@ namespace BlazorChat.Server.Services
         public Chat GetChat(string chatId)
         {
             var filter = Builders<Chat>.Filter.Eq(c => c.Id, chatId);
-            return _chats.Find<Chat>(filter).FirstOrDefault();
+            var projection = Builders<Chat>.Projection.Include(c => c.ParticipantA).Include(c => c.ParticipantB).Slice(c => c.Messages, -10);
+            return _chats.Find<Chat>(filter).Project<Chat>(projection).FirstOrDefault();
         }
 
         public Chat GetChat(string userId, string recipientId)
         {
             var filter = Builders<Chat>.Filter.Where(c => c.ParticipantA == userId && c.ParticipantB == recipientId)
                 | Builders<Chat>.Filter.Where(c => c.ParticipantA == recipientId && c.ParticipantB == userId);
-            return _chats.Find<Chat>(filter).FirstOrDefault();
+            var projection = Builders<Chat>.Projection.Include(c => c.ParticipantA).Include(c => c.ParticipantB).Slice(c => c.Messages, -10);
+
+            return _chats.Find<Chat>(filter).Project<Chat>(projection).FirstOrDefault();
         }
 
         public Chat StartChat(string userId, string recipientId)

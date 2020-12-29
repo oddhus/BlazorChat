@@ -35,14 +35,17 @@ namespace BlazorChat.ViewModels
         {
             try
             {
-                MessageDto message = this;
-                await _httpClient.PostAsJsonAsync<MessageDto>("chats/" + this.ChatId + "/message", message);
-                Failed = false;
+                if (!string.IsNullOrEmpty(ChatId) && !string.IsNullOrEmpty(Text))
+                {
+                    MessageDto message = this;
+                    await _httpClient.PostAsJsonAsync<MessageDto>("chats/" + this.ChatId + "/message", message);
+                    Messages.Add(message);
+                    Failed = false;
+                }
             }
-            catch (System.Exception)
+            catch (Exception e)
             {
-                Failed = true;
-                ErrorMessage = "Failed to post message";
+                ErrorMessage = $"Exception das: {e.Message}";
             }
         }
 
@@ -51,22 +54,37 @@ namespace BlazorChat.ViewModels
             LoadingGet = true;
             try
             {
-                var chat = await _httpClient.GetFromJsonAsync<ChatDto>("chats/" + this.ChatId);
-                Messages = chat.Messages;
-                if (chat.ParticipantA == SenderId)
+                if (!string.IsNullOrEmpty(ChatId))
                 {
-                    RecieverId = chat.ParticipantB;
-                }
-                else
-                {
-                    RecieverId = chat.ParticipantA;
+                    var response = await _httpClient.GetAsync("chats/" + ChatId);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var chat = await response.Content.ReadFromJsonAsync<ChatDto>();
+                        Messages = chat.Messages;
+                        if (chat.ParticipantA == SenderId)
+                        {
+                            RecieverId = chat.ParticipantB;
+                        }
+                        else
+                        {
+                            RecieverId = chat.ParticipantA;
+                        }
+                    }
+                    else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    {
+                        ErrorMessage = "You do not have access to this chat";
+                    }
+                    else
+                    {
+                        ErrorMessage = "Could not retrieve the chat";
+                    }
                 }
                 LoadingGet = false;
             }
             catch (Exception e)
             {
-                LoadingGet = false;
                 ErrorMessage = $"Exception: {e.Message}";
+                LoadingGet = false;
             }
         }
 
