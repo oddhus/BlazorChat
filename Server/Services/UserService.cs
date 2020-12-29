@@ -1,5 +1,6 @@
 using BlazorChat.Server.Models;
 using BlazorChat.Shared.Dtos;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,12 +44,12 @@ namespace BlazorChat.Server.Services
             if (!string.IsNullOrEmpty(firstname))
             {
                 firstname = firstname.ToLower();
-                filter &= (Builders<User>.Filter.Eq(x => x.Firstname, firstname));
+                filter &= (Builders<User>.Filter.Regex(x => x.Firstname, new BsonRegularExpression(firstname)));
             }
             if (!string.IsNullOrEmpty(lastname))
             {
                 lastname = lastname.ToLower();
-                filter &= (Builders<User>.Filter.Eq(x => x.Lastname, lastname));
+                filter &= (Builders<User>.Filter.Regex(x => x.Lastname, new BsonRegularExpression(lastname)));
             }
             return _users.Find(filter).Limit(10).ToList();
         }

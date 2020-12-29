@@ -1,6 +1,8 @@
 ﻿@page "/contacts"
 @using BlazorChat.Shared.Dtos
 @using BlazorChat.ViewModels
+@using System.ComponentModel
+@using AntDesign.TableModels
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IContactsViewModel _contactsViewModel
@@ -32,9 +34,12 @@
     <Header>Result</Header>
     <ChildContent Context="item">
       <ListItem>
-        <span><Text Mark>
+        <span>
+          <Text Mark>
             <p>@item.Firstname @item.Lastname</p>
-          </Text></span><Button OnClick="(e)=>{_contactsViewModel.AddContact(item.Id);}">Add</Button>
+          </Text>
+        </span>
+        <Button OnClick="(e)=>{_contactsViewModel.AddContact(item.Id);}">Add</Button>
       </ListItem>
     </ChildContent>
   </AntList>
@@ -53,25 +58,38 @@
 }
 else
 {
-  <AntList DataSource="@_contactsViewModel.Contacts" TItem="ContactDto">
-    <ListItem>
-      <ListItemMeta Avatar="avatar" Description="@context.Address">
-        <TitleTemplate>
-          @if (@context.ChatId == null)
-        {
-          <span>@context.Firstname @context.Lastname</span>
-          <Button OnClick="(e)=>{_contactsViewModel.StartChat(context.Id);}">Start chat</Button>
-        }
-        else
-        {
-          <span><a href="/chat/@context.ChatId">@context.Firstname @context.Lastname</a></span>
-        }
-        <Button OnClick="(e)=>{_contactsViewModel.DeleteContact(context.Id);}">Remove</Button>
+  <Table TItem="ContactDto" DataSource="@_contactsViewModel.Contacts">
+    <Column @bind-Field="@context.Firstname">
+      <a href="/chat/@context.ChatId">@context.Firstname</a>
+    </Column>
+    <Column @bind-Field="@context.Lastname"></Column>
+    <Column @bind-Field="@context.Address">
+      <TitleTemplate>
+        <span>
+          <Icon Type="environment" /> Address
+        </span>
       </TitleTemplate>
-    </ListItemMeta>
-  </ListItem>
-</AntList>
+    </Column>
+    <Column @bind-Field="@context.ChatId" Title="Status">
+      @if (@context.ChatId == null)
+      {
+              <Button OnClick="(e)=>{_contactsViewModel.StartChat(context.Id);}">Start chat</Button>
+      }
+      else
+      {
+              <Tag Color="green">Chatting</Tag>
+      }
+          </Column>
+          <ActionColumn>
+            <Space>
+              <SpaceItem>
+                <Button Danger OnClick="(e)=>{_contactsViewModel.DeleteContact(context.Id);}">Delete</Button>
+              </SpaceItem>
+            </Space>
+          </ActionColumn>
+        </Table>
 }
+
 
 <style>
   .spinnerContainer {
@@ -104,4 +122,9 @@ else
     }
   }
   [Parameter] public bool openAddContact { get; set; }
+
+  void OnContactClick(string chatId)
+  {
+    NavigationManager.NavigateTo($"/chat/{chatId}");
+  }
 }
