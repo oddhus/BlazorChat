@@ -8,15 +8,21 @@ namespace BlazorChat.ViewModels
 {
     public class RegisterViewModel : IRegisterViewModel
     {
+        [MinLength(2)]
+        [MaxLength(32)]
         [Required]
         public string Username { get; set; }
         [Required]
+        [MinLength(8)]
         public string Password { get; set; }
+        [Compare("Password")]
         [Required]
         public string RepeatPassword { get; set; }
         [Required]
+        [MinLength(2)]
         public string Firstname { get; set; }
         [Required]
+        [MinLength(2)]
         public string Lastname { get; set; }
         public string Address { get; set; }
         public bool DarkTheme { get; set; }

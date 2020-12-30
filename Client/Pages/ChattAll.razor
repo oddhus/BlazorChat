@@ -3,59 +3,98 @@
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 
-<div class="form-group">
-    <label>
-        User:
-        <input @bind="userInput" />
-    </label>
-</div>
-<div class="form-group">
-    <label>
-        Message:
-        <input @bind="messageInput" size="50" />
-    </label>
-</div>
-<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
+<div>
+    <Comment Avatar="@(@"https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png")">
+        <ContentTemplate>
+            <div>
+                <TextArea MinRows="4" @bind-Value="messageInput" />
+                <br />
+                <br />
+                <Button Disabled="@(!IsConnected)" OnClick="Send " type="primary">
+                    Add Comment
+                </Button>
+            </div>
+        </ContentTemplate>
+    </Comment>
 
-<hr>
-
-<ul id="messagesList">
-    @foreach (var message in messages)
+    @if (messages.Count > 0)
     {
-        <li>@message</li>
+        <AntList DataSource="messages" TItem="Message">
+            <ListItem>
+                <Comment Avatar="@(@"https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png")"
+                    Author="@context.Author" Datetime="@context.Sent.ToString()" Content="@context.Content"></Comment>
+            </ListItem>
+        </AntList>
     }
-</ul>
+</div>
 
 @code {
     private HubConnection hubConnection;
-    private List<string> messages = new List<string>();
+    private List<Message> messages = new List<Message>();
     private string userInput;
     private string messageInput;
+    private string errorMessage;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
-            .Build();
-
-        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+        if (user.Identity.IsAuthenticated)
+        {
+            try
             {
-            var encodedMsg = $"{user}: {message}";
-            messages.Add(encodedMsg);
-            StateHasChanged();
-        });
+                userInput = user.Identity.Name;
 
-        await hubConnection.StartAsync();
+                hubConnection = new HubConnectionBuilder()
+                    .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+                    .Build();
+
+                hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+                    {
+                    messages.Insert(0, new Message(user, message));
+                    StateHasChanged();
+                });
+
+                await hubConnection.StartAsync();
+            }
+            catch (Exception e)
+            {
+                errorMessage = $"ERROR: Failed to start chat client: {e.Message}";
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
     }
 
     Task Send() =>
         hubConnection.SendAsync("SendMessage", userInput, messageInput);
 
     public bool IsConnected =>
-        hubConnection.State == HubConnectionState.Connected;
+        hubConnection != null || hubConnection.State == HubConnectionState.Connected;
 
     public async ValueTask DisposeAsync()
     {
-        await hubConnection.DisposeAsync();
+        if (hubConnection != null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    class Message
+    {
+        public string Author { get; set; }
+        public string Content { get; set; }
+        public DateTime Sent { get; set; }
+        public Message(string author, string content)
+        {
+            Author = author;
+            Content = content;
+            Sent = DateTime.Now;
+        }
     }
 }
