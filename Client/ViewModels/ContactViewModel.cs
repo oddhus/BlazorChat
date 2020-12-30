@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -20,6 +22,7 @@ namespace BlazorChat.ViewModels
         public bool LoadingUpdate { get; set; }
         public bool Failed { get; set; }
         public string ErrorMessage { get; set; }
+        public event Action OnChange;
         public List<ContactDto> SearchResult { get; set; }
         public List<ContactDto> Contacts { get; set; }
         private HttpClient _httpClient;
@@ -32,6 +35,8 @@ namespace BlazorChat.ViewModels
         {
             _httpClient = httpClient;
         }
+
+        private void NotifyStateChanged() => OnChange?.Invoke();
 
         public async Task FindUsers()
         {
@@ -54,6 +59,7 @@ namespace BlazorChat.ViewModels
                 ContactDto contactDto = this.SearchResult.Find(contact => contact.Id == id);
                 var response = await _httpClient.PostAsJsonAsync<ContactDto>("users/" + this.UserId + "/contacts", contactDto);
                 LoadCurrentObject(await response.Content.ReadFromJsonAsync<ContactDto[]>());
+                NotifyStateChanged();
                 Failed = false;
                 LoadingUpdate = false;
             }
@@ -71,7 +77,8 @@ namespace BlazorChat.ViewModels
             try
             {
                 await _httpClient.DeleteAsync("users/" + this.UserId + "/contacts/" + contactId);
-                this.Contacts.RemoveAll(c => c.Id == contactId);
+                UpdateContacts(this.Contacts.Where(c => c.Id != contactId).ToList());
+                NotifyStateChanged();
                 Failed = false;
                 LoadingUpdate = false;
             }
@@ -89,8 +96,11 @@ namespace BlazorChat.ViewModels
             try
             {
                 var res = await _httpClient.PostAsJsonAsync<ContactDto>("chats/" + this.UserId + "/start/" + contactId, null);
-                var contact = this.Contacts.Find(c => c.Id == contactId);
-                contact = await res.Content.ReadFromJsonAsync<ContactDto>();
+                var contactIndex = this.Contacts.FindIndex(c => c.Id == contactId);
+                var contact = await res.Content.ReadFromJsonAsync<ContactDto>();
+                this.Contacts[contactIndex] = contact;
+                UpdateContacts(this.Contacts);
+                NotifyStateChanged();
                 Failed = false;
                 LoadingUpdate = false;
             }
@@ -112,6 +122,15 @@ namespace BlazorChat.ViewModels
         }
 
         private void LoadCurrentObject(ContactDto[] contacts)
+        {
+            this.Contacts = new List<ContactDto>();
+            foreach (ContactDto contact in contacts)
+            {
+                this.Contacts.Add(contact);
+            }
+        }
+
+        private void UpdateContacts(List<ContactDto> contacts)
         {
             this.Contacts = new List<ContactDto>();
             foreach (ContactDto contact in contacts)

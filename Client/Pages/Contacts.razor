@@ -6,6 +6,8 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IContactsViewModel _contactsViewModel
+@implements IDisposable
+
 
 <h1>Contacts</h1>
 
@@ -39,7 +41,8 @@
             <p>@item.Firstname @item.Lastname</p>
           </Text>
         </span>
-        <Button OnClick="(e)=>{_contactsViewModel.AddContact(item.Id);}">Add</Button>
+        <Button
+          OnClick="(e)=>{_contactsViewModel.AddContact(item.Id); openAddContact=false; StateHasChanged();}">Add</Button>
       </ListItem>
     </ChildContent>
   </AntList>
@@ -102,11 +105,17 @@ else
 </style>
 
 @code {
+  public void Dispose()
+  {
+    _contactsViewModel.OnChange -= StateHasChanged;
+  }
+
   [CascadingParameter]
   private Task<AuthenticationState> authenticationStateTask { get; set; }
 
   protected override async Task OnInitializedAsync()
   {
+    _contactsViewModel.OnChange += StateHasChanged;
     var authState = await authenticationStateTask;
     var user = authState.User;
 

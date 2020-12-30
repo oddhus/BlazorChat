@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BlazorChat.Shared.Dtos;
@@ -17,6 +18,7 @@ namespace BlazorChat.ViewModels
         public string ErrorMessage { get; set; }
         public string SearchFirstname { get; set; }
         public string SearchLastname { get; set; }
+        public event Action OnChange;
         public List<ContactDto> Contacts { get; set; }
         public List<ContactDto> SearchResult { get; set; }
         public Task GetContacts();
