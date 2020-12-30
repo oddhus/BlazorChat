@@ -17,3 +17,5 @@ Shared/bin
 # Ignore .vscode and .vs
 .vscode
 .vs
+
+publish
