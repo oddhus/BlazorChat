@@ -3,7 +3,7 @@
 @inject IProfileViewModel _profileViewModel
 @inject NavigationManager NavigationManager
 
-<Title Level="1">Profile</Title>
+<Title Level="1">@($"{_profileViewModel.AccountName}'s profile")</Title>
 
 @if (_profileViewModel.LoadingGet)
 {
@@ -40,22 +40,22 @@ else
       <AntDesign.Row>
         <AntDesign.Col Xs="24" Md="18" Lg="12">
           <Card>
-            <CardGrid Style="width:25%;text-align:center">
+            <CardGrid Style="width:35%;text-align:center">
               <Text Strong>Firstname</Text>
             </CardGrid>
-            <CardGrid Style="width:75%;text-align:center">
+            <CardGrid Style="width:65%;text-align:center">
               @_profileViewModel.Firstname
             </CardGrid>
-            <CardGrid Style="width:25%;text-align:center">
+            <CardGrid Style="width:35%;text-align:center">
               <Text Strong>Lastname</Text>
             </CardGrid>
-            <CardGrid Style="width:75%;text-align:center">
+            <CardGrid Style="width:65%;text-align:center">
               @_profileViewModel.Lastname
             </CardGrid>
-            <CardGrid Style="width:25%;text-align:center">
+            <CardGrid Style="width:35%;text-align:center">
               <Text Strong>Address</Text>
             </CardGrid>
-            <CardGrid Style="width:75%;text-align:center">
+            <CardGrid Style="width:65%;text-align:center">
               @_profileViewModel.Address
             </CardGrid>
           </Card>
@@ -81,6 +81,7 @@ else
     if (user.Identity.IsAuthenticated)
     {
       var userId = user.FindFirst(c => c.Type == "UserId")?.Value;
+      _profileViewModel.AccountName = user.Identity.Name;
       _profileViewModel.Id = userId;
       await _profileViewModel.GetProfile();
     }

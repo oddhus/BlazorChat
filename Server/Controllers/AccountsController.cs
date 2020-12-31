@@ -76,7 +76,7 @@ namespace BlazorChat.Server.Controllers
             var account = _accountService.Login(credentials);
             if (account == null)
             {
-                return Forbid();
+                return StatusCode(403);
             }
 
             var claimName = new Claim(ClaimTypes.Name, account.Username);

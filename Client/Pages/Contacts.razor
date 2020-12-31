@@ -7,7 +7,6 @@
 @implements IDisposable
 
 <Title Level="1">Contacts</Title>
-<Text>Add a contact and start chatting</Text>
 
 @if (@openAddContact)
 {
@@ -48,7 +47,14 @@
 
 @if (!openAddContact)
 {
-  <Button OnClick="(e)=>{openAddContact = true;}">Add Contact</Button>
+  <Space>
+    <SpaceItem>
+      <Text>Add a contact and start chatting</Text>
+    </SpaceItem>
+    <SpaceItem>
+      <Button OnClick="(e)=>{openAddContact = true;}">Add Contact</Button>
+    </SpaceItem>
+  </Space>
 }
 
 @if (_contactsViewModel.Contacts == null)
@@ -59,6 +65,7 @@
 }
 else
 {
+  <Divider></Divider>
   <Table TItem="ContactDto" DataSource="@_contactsViewModel.Contacts">
     <Column @bind-Field="@context.Firstname">
       <a href="/chat/@context.ChatId">@context.Firstname</a>
