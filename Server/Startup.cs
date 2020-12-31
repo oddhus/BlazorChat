@@ -80,6 +80,7 @@ namespace BlazorChat.Server
             app.UseStaticFiles();
 
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseRouting();
 

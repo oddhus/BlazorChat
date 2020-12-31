@@ -78,7 +78,7 @@
         hubConnection.SendAsync("SendMessage", userInput, messageInput);
 
     public bool IsConnected =>
-        hubConnection != null || hubConnection.State == HubConnectionState.Connected;
+        hubConnection != null && hubConnection.State == HubConnectionState.Connected;
 
     public async ValueTask DisposeAsync()
     {

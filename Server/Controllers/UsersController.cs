@@ -3,9 +3,7 @@ using BlazorChat.Shared.Dtos;
 using AutoMapper;
 using BlazorChat.Server.Services;
 using System.Collections.Generic;
-using System.Linq;
 using BlazorChat.Server.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace BlazorChat.Server.Controllers
 {
