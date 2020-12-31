@@ -12,7 +12,8 @@ namespace BlazorChat.ViewModels
         public bool LoadingUpdate { get; set; }
         public bool Failed { get; set; }
         public string ErrorMessage { get; set; }
-
+        public bool isEditing { get; set; }
+        public void Edit();
         public Task GetProfile();
         public Task UpdateProfile();
     }

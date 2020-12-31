@@ -24,6 +24,21 @@
 
 @code
 {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            _navigationManager.NavigateTo("/profile", true);
+        }
+    }
+
     public async Task LoginUser()
     {
         await _loginViewModel.Login();

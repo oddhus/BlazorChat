@@ -1,15 +1,13 @@
 ﻿@page "/contacts"
 @using BlazorChat.Shared.Dtos
 @using BlazorChat.ViewModels
-@using System.ComponentModel
-@using AntDesign.TableModels
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IContactsViewModel _contactsViewModel
 @implements IDisposable
 
-
-<h1>Contacts</h1>
+<Title Level="1">Contacts</Title>
+<Text>Add a contact and start chatting</Text>
 
 @if (@openAddContact)
 {

@@ -15,7 +15,7 @@ namespace BlazorChat.ViewModels
         public bool LoadingUpdate { get; set; }
         public bool Failed { get; set; }
         public string ErrorMessage { get; set; }
-
+        public bool isEditing { get; set; }
         private HttpClient _httpClient;
 
         public ProfileViewModel()
@@ -48,6 +48,11 @@ namespace BlazorChat.ViewModels
             };
         }
 
+        public void Edit()
+        {
+            isEditing = !isEditing;
+        }
+
         public async Task GetProfile()
         {
             LoadingGet = true;
@@ -73,6 +78,7 @@ namespace BlazorChat.ViewModels
             {
                 await _httpClient.PutAsJsonAsync("users/" + this.Id, this);
                 Failed = false;
+                isEditing = false;
                 LoadingUpdate = false;
             }
             catch (System.Exception)
