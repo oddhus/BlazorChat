@@ -7,7 +7,6 @@ Client/bin
 Server/Properties
 Server/obj
 Server/bin
-Server/appsettings.json
 
 
 # Ignore bin folder on Blazor Shared
